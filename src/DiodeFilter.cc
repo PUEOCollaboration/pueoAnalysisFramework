@@ -1,8 +1,8 @@
-#include "DiodeFilter.h" 
+#include "pueo/DiodeFilter.h" 
 #include "TMath.h" 
 
 
-DiodeFilter::DiodeFilter() 
+pueo::DiodeFilter::DiodeFilter() 
   : response(260)
 {
 
@@ -30,7 +30,7 @@ DiodeFilter::DiodeFilter()
 }
 
 
-void DiodeFilter::processOne(AnalysisWaveform * wf, const RawAnitaHeader *, int,int)
+void pueo::DiodeFilter::processOne(AnalysisWaveform * wf, const RawHeader *, int,int)
 {
 
   //we start with the hilbert envelope of the waveform 

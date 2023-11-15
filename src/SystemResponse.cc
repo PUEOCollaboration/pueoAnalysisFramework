@@ -1,15 +1,16 @@
-#include "SystemResponse.h" 
+#include "pueo/SystemResponse.h" 
 #include "FFTtools.h" 
 #include "TF1.h" 
 
-#include "AnalysisWaveform.h" 
+#include "pueo/AnalysisWaveform.h" 
 
 
-static AnitaResponse::BandLimitedDeconvolution bld(0.18,1.1); 
-AnitaResponse::DeconvolutionMethod & AnitaResponse::kDefaultDeconvolution = bld; 
+static pueo::BandLimitedDeconvolution bld(0.18,1.1); 
+
+pueo::DeconvolutionMethod & pueo::kDefaultDeconvolution = bld; 
 
 
-void AnitaResponse::DeconvolutionMethod::deconvolve(int Nf, double df, FFTWComplex * Y, const FFTWComplex * response) const
+void pueo::DeconvolutionMethod::deconvolve(int Nf, double df, FFTWComplex * Y, const FFTWComplex * response) const
 {
   AnalysisWaveform wf(2*(Nf-1),Y, df,0);
   AnalysisWaveform r(2*(Nf-1),response, df,0);
@@ -17,7 +18,7 @@ void AnitaResponse::DeconvolutionMethod::deconvolve(int Nf, double df, FFTWCompl
 
 }
 
-void AnitaResponse::WienerDeconvolution::deconvolve(AnalysisWaveform *wf, const AnalysisWaveform * response_wf) const 
+void pueo::WienerDeconvolution::deconvolve(AnalysisWaveform *wf, const AnalysisWaveform * response_wf) const 
 {
 
   size_t N = wf->Nfreq(); 
@@ -45,7 +46,7 @@ void AnitaResponse::WienerDeconvolution::deconvolve(AnalysisWaveform *wf, const 
 }
 
 
-AnitaResponse::WienerDeconvolution::WienerDeconvolution(const TGraph *g, const double * sc) 
+pueo::WienerDeconvolution::WienerDeconvolution(const TGraph *g, const double * sc) 
 {
   snr_graph = g; 
   min = g->GetX()[0]; 
@@ -55,7 +56,7 @@ AnitaResponse::WienerDeconvolution::WienerDeconvolution(const TGraph *g, const d
   scale = sc; 
 }
 
-AnitaResponse::WienerDeconvolution::WienerDeconvolution(const TF1 *f) 
+pueo::WienerDeconvolution::WienerDeconvolution(const TF1 *f) 
 {
   snr_function = f; 
   noise_level = 0;
@@ -64,7 +65,7 @@ AnitaResponse::WienerDeconvolution::WienerDeconvolution(const TF1 *f)
   scale = 0; 
 }
 
-AnitaResponse::WienerDeconvolution::WienerDeconvolution(double N) 
+pueo::WienerDeconvolution::WienerDeconvolution(double N) 
 {
   snr_graph = 0; 
   scale = 0; 
@@ -74,7 +75,7 @@ AnitaResponse::WienerDeconvolution::WienerDeconvolution(double N)
 
 
 
-double AnitaResponse::WienerDeconvolution::snr(double f, double R2, int N ) const
+double pueo::WienerDeconvolution::snr(double f, double R2, int N ) const
 {
 
 
@@ -101,7 +102,7 @@ double AnitaResponse::WienerDeconvolution::snr(double f, double R2, int N ) cons
   return -1; 
 }
 
-void AnitaResponse::AllPassDeconvolution::deconvolve(AnalysisWaveform * wf, const AnalysisWaveform * response_wf) const 
+void pueo::AllPassDeconvolution::deconvolve(AnalysisWaveform * wf, const AnalysisWaveform * response_wf) const 
 {
 
   size_t N = wf->Nfreq(); 
@@ -116,7 +117,7 @@ void AnitaResponse::AllPassDeconvolution::deconvolve(AnalysisWaveform * wf, cons
   }
 }
 
-void AnitaResponse::ImpulseResponseXCorr::deconvolve(AnalysisWaveform * wf, const AnalysisWaveform * response_wf) const 
+void pueo::ImpulseResponseXCorr::deconvolve(AnalysisWaveform * wf, const AnalysisWaveform * response_wf) const 
 {
 
   size_t N = wf->Nfreq(); 
@@ -136,7 +137,7 @@ void AnitaResponse::ImpulseResponseXCorr::deconvolve(AnalysisWaveform * wf, cons
   }
 }
 
-AnitaResponse::CLEAN::CLEAN(int max_loops, double loop_gain, double thresh_factor, TString restoring_beam, bool add_residuals, bool only_return_residuals)
+pueo::CLEAN::CLEAN(int max_loops, double loop_gain, double thresh_factor, TString restoring_beam, bool add_residuals, bool only_return_residuals)
 {
   fMaxLoops = max_loops;
   fLoopGain = loop_gain;
@@ -146,7 +147,7 @@ AnitaResponse::CLEAN::CLEAN(int max_loops, double loop_gain, double thresh_facto
   fOnlyReturnResiduals = only_return_residuals;
 }
 
-void AnitaResponse::CLEAN::deconvolve(AnalysisWaveform * Y, const AnalysisWaveform * resp) const 
+void pueo::CLEAN::deconvolve(AnalysisWaveform * Y, const AnalysisWaveform * resp) const 
 {
   //set up analysis waveforms
   AnalysisWaveform clean(*Y);
@@ -310,7 +311,7 @@ void AnitaResponse::CLEAN::deconvolve(AnalysisWaveform * Y, const AnalysisWavefo
   }
 }
 
-void AnitaResponse::NaiveDeconvolution::deconvolve(AnalysisWaveform * wf, const AnalysisWaveform * response_wf) const 
+void pueo::NaiveDeconvolution::deconvolve(AnalysisWaveform * wf, const AnalysisWaveform * response_wf) const 
 {
 
   size_t N = wf->Nfreq(); 
@@ -323,7 +324,7 @@ void AnitaResponse::NaiveDeconvolution::deconvolve(AnalysisWaveform * wf, const 
   }
 }
 
-void AnitaResponse::BandLimitedDeconvolution::deconvolve(AnalysisWaveform * wf, const AnalysisWaveform * response_wf) const 
+void pueo::BandLimitedDeconvolution::deconvolve(AnalysisWaveform * wf, const AnalysisWaveform * response_wf) const 
 {
 
   size_t N = wf->Nfreq(); 
@@ -353,7 +354,7 @@ void AnitaResponse::BandLimitedDeconvolution::deconvolve(AnalysisWaveform * wf, 
 
 
 
-AnitaResponse::Response::Response(int Nfreq, double df, int nangles, const double * the_angles, const FFTWComplex ** the_responses)  
+pueo::Response::Response(int Nfreq, double df, int nangles, const double * the_angles, const FFTWComplex ** the_responses)  
   : Nfreq(Nfreq), df(df)
 {
   for (int i = 0; i < nangles; i++) 
@@ -363,7 +364,7 @@ AnitaResponse::Response::Response(int Nfreq, double df, int nangles, const doubl
 
 }
 
-void AnitaResponse::Response::addResponseAtAngle(double angle, const FFTWComplex * response) 
+void pueo::Response::addResponseAtAngle(double angle, const FFTWComplex * response) 
 {
     FFTWComplex * copy = new FFTWComplex[Nfreq]; 
     memcpy(copy, response, Nfreq * sizeof(FFTWComplex)); 
@@ -372,13 +373,13 @@ void AnitaResponse::Response::addResponseAtAngle(double angle, const FFTWComplex
     dirty = true; 
 }
 
-AnitaResponse::Response::Response(int Nfreq, double df)
+pueo::Response::Response(int Nfreq, double df)
  : Nfreq(Nfreq), df(df) 
 {
 
 }
 
-AnitaResponse::Response::Response(const TGraph * timedomain, int npad)
+pueo::Response::Response(const TGraph * timedomain, int npad)
 {
   AnalysisWaveform aw(timedomain->GetN(), timedomain->GetX(), timedomain->GetY(), timedomain->GetX()[1] - timedomain->GetX()[0]); 
   aw.padEven(npad); 
@@ -390,14 +391,14 @@ AnitaResponse::Response::Response(const TGraph * timedomain, int npad)
 
 
 
-AnitaResponse::Response::Response(int Nfreq, double df, const FFTWComplex * response)  
+pueo::Response::Response(int Nfreq, double df, const FFTWComplex * response)  
   : Nfreq(Nfreq),df(df)
 {
   addResponseAtAngle(0, response); 
 }
 
 
-FFTWComplex * AnitaResponse::AbstractResponse::getResponseArray(int N, const double * f, double angle, FFTWComplex *answer) const
+FFTWComplex * pueo::AbstractResponse::getResponseArray(int N, const double * f, double angle, FFTWComplex *answer) const
 {
   if (!answer)  answer = new FFTWComplex[N]; 
   for (int i = 0; i < N; i++) answer[i] = getResponse(f[i], angle); 
@@ -405,7 +406,7 @@ FFTWComplex * AnitaResponse::AbstractResponse::getResponseArray(int N, const dou
 
 }
 
-FFTWComplex * AnitaResponse::AbstractResponse::getResponseArray(int N, double  df, double angle, FFTWComplex *answer) const
+FFTWComplex * pueo::AbstractResponse::getResponseArray(int N, double  df, double angle, FFTWComplex *answer) const
 {
   if (!answer) answer = new FFTWComplex[N]; 
   for (int i = 0; i < N; i++) answer[i] = getResponse(i*df, angle); 
@@ -414,7 +415,7 @@ FFTWComplex * AnitaResponse::AbstractResponse::getResponseArray(int N, double  d
 
 
 
-void AnitaResponse::Response::recompute()  const
+void pueo::Response::recompute()  const
 {
 
   int nangles = responses.size(); 
@@ -465,7 +466,7 @@ void AnitaResponse::Response::recompute()  const
   dirty = false; 
 }
 
-FFTWComplex AnitaResponse::CompositeResponse::getResponse(double f, double angle )  const
+FFTWComplex pueo::CompositeResponse::getResponse(double f, double angle )  const
 {
 
   FFTWComplex answer(1,0); 
@@ -478,7 +479,7 @@ FFTWComplex AnitaResponse::CompositeResponse::getResponse(double f, double angle
 
 
 
-FFTWComplex AnitaResponse::Response::getResponse(double f, double angle ) const
+FFTWComplex pueo::Response::getResponse(double f, double angle ) const
 {
   lock.Lock();
   if (dirty)
@@ -496,12 +497,12 @@ FFTWComplex AnitaResponse::Response::getResponse(double f, double angle ) const
   return FFTWComplex(re,im); 
 }
 
-double AnitaResponse::AbstractResponse::getMagnitude(double f, double angle) const 
+double pueo::AbstractResponse::getMagnitude(double f, double angle) const 
 {
   return getResponse(f,angle).getAbs(); 
 }
 
-double AnitaResponse::AbstractResponse::getPhase(double f, double angle) const 
+double pueo::AbstractResponse::getPhase(double f, double angle) const 
 {
   return getResponse(f,angle).getPhase(); 
 }
@@ -511,7 +512,7 @@ double AnitaResponse::AbstractResponse::getPhase(double f, double angle) const
 
 
 
-AnalysisWaveform* AnitaResponse::AbstractResponse::impulseResponse(double dt, int N )  const
+pueo::AnalysisWaveform* pueo::AbstractResponse::impulseResponse(double dt, int N )  const
 {
   AnalysisWaveform * out = new AnalysisWaveform(N, dt); 
   out->updateEven()->GetY()[1] = 1; 
@@ -519,7 +520,7 @@ AnalysisWaveform* AnitaResponse::AbstractResponse::impulseResponse(double dt, in
   return out; 
 }
 
-void AnitaResponse::AbstractResponse::convolveInPlace(AnalysisWaveform * wf, double angle)  const
+void pueo::AbstractResponse::convolveInPlace(AnalysisWaveform * wf, double angle)  const
 {
   int old_size = wf->Neven(); 
 //  wf->padEven(2); 
@@ -533,7 +534,7 @@ void AnitaResponse::AbstractResponse::convolveInPlace(AnalysisWaveform * wf, dou
   wf->updateEven()->Set(old_size); 
 }
 
-AnalysisWaveform * AnitaResponse::AbstractResponse::convolve(const AnalysisWaveform * in,  double off_axis_angle ) const
+pueo::AnalysisWaveform * pueo::AbstractResponse::convolve(const AnalysisWaveform * in,  double off_axis_angle ) const
 {
 
   //copy 
@@ -542,7 +543,7 @@ AnalysisWaveform * AnitaResponse::AbstractResponse::convolve(const AnalysisWavef
   return out; 
 }
 
-AnalysisWaveform * AnitaResponse::AbstractResponse::deconvolve(const AnalysisWaveform * in,  const DeconvolutionMethod * method, double off_axis_angle) const
+pueo::AnalysisWaveform * pueo::AbstractResponse::deconvolve(const AnalysisWaveform * in,  const DeconvolutionMethod * method, double off_axis_angle) const
 {
 
   //copy 
@@ -553,15 +554,15 @@ AnalysisWaveform * AnitaResponse::AbstractResponse::deconvolve(const AnalysisWav
 
 
 /** caching vars */ 
-static __thread const AnitaResponse::AbstractResponse *cache_response = 0; 
+static __thread const pueo::AbstractResponse *cache_response = 0; 
 static __thread int cache_Nt= 0; 
 static __thread double cache_df= 0; 
 static __thread double cache_angle= 0; 
 static __thread FFTWComplex *cache_V = 0; 
-static __thread AnalysisWaveform * cache_response_wf = 0;
+static __thread pueo::AnalysisWaveform * cache_response_wf = 0;
 
 
-void AnitaResponse::AbstractResponse::deconvolveInPlace(AnalysisWaveform * wf,  const DeconvolutionMethod * method, double off_axis_angle) const
+void pueo::AbstractResponse::deconvolveInPlace(AnalysisWaveform * wf,  const DeconvolutionMethod * method, double off_axis_angle) const
 {
 //  printf("method: %p\n", method); 
   wf->padEven(1,0); 
@@ -590,7 +591,7 @@ void AnitaResponse::AbstractResponse::deconvolveInPlace(AnalysisWaveform * wf,  
 /// CLEAN 
 //
 
-void AnitaResponse::CLEANDeconvolution::clearIntermediate() const
+void pueo::CLEANDeconvolution::clearIntermediate() const
 {
 
   for (unsigned i = 0; i < save_xcorr.size(); i++) delete save_xcorr[i]; 
@@ -601,7 +602,7 @@ void AnitaResponse::CLEANDeconvolution::clearIntermediate() const
   save_subtracted.clear(); 
 }
 
-void AnitaResponse::CLEANDeconvolution::deconvolve(AnalysisWaveform *y, const AnalysisWaveform * h) const
+void pueo::CLEANDeconvolution::deconvolve(AnalysisWaveform *y, const AnalysisWaveform * h) const
 {
 
 

@@ -1,11 +1,11 @@
-#include "Polarimetry.h" 
-#include "AnalysisWaveform.h" 
+#include "pueo/Polarimetry.h" 
+#include "pueo/AnalysisWaveform.h" 
 
 #include "TMultiGraph.h" 
 #include "TAxis.h" 
 #include "FFTtools.h" 
 
-polarimetry::StokesAnalysis::StokesAnalysis(const StokesAnalysis & other) 
+pueo::polarimetry::StokesAnalysis::StokesAnalysis(const StokesAnalysis & other) 
 {
 
   avgI = other.avgI; 
@@ -41,7 +41,7 @@ polarimetry::StokesAnalysis::StokesAnalysis(const StokesAnalysis & other)
 }
 
 
-polarimetry::StokesAnalysis::StokesAnalysis(const AnalysisWaveform * H, const AnalysisWaveform *V, double xcorr, double time_around_peak) 
+pueo::polarimetry::StokesAnalysis::StokesAnalysis(const AnalysisWaveform * H, const AnalysisWaveform *V, double xcorr, double time_around_peak) 
 {
   //figure out if we need to resample both to the same time base
   
@@ -209,7 +209,7 @@ polarimetry::StokesAnalysis::StokesAnalysis(const AnalysisWaveform * H, const An
 }
 
 
-int polarimetry::StokesAnalysis::computeWindowedAverage(double Ifrac, double *I, double *Q, double  *U, double *V, double *PoPerr) const
+int pueo::polarimetry::StokesAnalysis::computeWindowedAverage(double Ifrac, double *I, double *Q, double  *U, double *V, double *PoPerr) const
 {
   int Imax = TMath::LocMax(dI->GetN(), dI->GetY()); 
   double I0 = dI->GetY()[Imax];

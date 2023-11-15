@@ -1,14 +1,15 @@
-#include "InterpolatedNotch.h"
+#include "pueo/InterpolatedNotch.h"
 #include "FFTtools.h"
+
 using namespace std;
-void interpolatedNotchFilter::init(){
+void pueo::InterpolatedNotchFilter::init(){
   notchLower,notchHigher = false;
   lowBin,lowSigma,highBin,highSigma =0;
 }
-interpolatedNotchFilter::interpolatedNotchFilter(){
+pueo::InterpolatedNotchFilter::InterpolatedNotchFilter(){
   init();
 }
-TGraph * interpolatedNotchFilter::interpolatedFilter(TGraph *grWave, Double_t minFreq, Double_t maxFreq) //interpolated filter. Do interpolation across notch
+TGraph * pueo::InterpolatedNotchFilter::interpolatedFilter(TGraph *grWave, Double_t minFreq, Double_t maxFreq) //interpolated filter. Do interpolation across notch
 {
   if(maxFreq>1200){
     maxFreq=1200;
@@ -81,7 +82,8 @@ TGraph * interpolatedNotchFilter::interpolatedFilter(TGraph *grWave, Double_t mi
   delete [] filteredVals;
   return grFilteredNotch;
 }//interpolated notch
-void interpolatedNotchFilter::cutParams(bool notchLower,Double_t lowBinCenter,Double_t lowBinSigma,bool notchHigher,
+
+void pueo::InterpolatedNotchFilter::cutParams(bool notchLower,Double_t lowBinCenter,Double_t lowBinSigma,bool notchHigher,
                     Double_t highBinCenter,Double_t highBinSigma){
   if(notchLower){
     lowBin = 1000*lowBinCenter;
@@ -94,14 +96,14 @@ void interpolatedNotchFilter::cutParams(bool notchLower,Double_t lowBinCenter,Do
     //cout<<"notching "<<highBin-highSigma<<" to "<<highBin+highSigma<<endl;
   }else{highBin =0.;highSigma =0.;}
 }
-void interpolatedNotchFilter::process(FilteredAnitaEvent *ev){
-  for(int ant = 0;ant<NUM_SEAVEYS;ant++){
-    AnalysisWaveform * unfiltV = getWf(ev, ant, AnitaPol::kVertical);
+void pueo::InterpolatedNotchFilter::process(FilteredEvent *ev){
+  for(int ant = 0;ant<k::NUM_ANTS;ant++){
+    AnalysisWaveform * unfiltV = getWf(ev, ant, pol::kVertical);
     TGraph *notchLowV = interpolatedFilter((TGraph*)unfiltV->even(), lowBin-lowSigma, lowBin+lowSigma);
     TGraph *notchHighV = interpolatedFilter(notchLowV,highBin-highSigma,highBin+highSigma);
     AnalysisWaveform *notchedV = AnalysisWaveform::makeWf(notchHighV);
     unfiltV->updateEven(notchedV->even());
-    AnalysisWaveform * unfiltH = getWf(ev, ant, AnitaPol::kHorizontal);
+    AnalysisWaveform * unfiltH = getWf(ev, ant, pol::kHorizontal);
     TGraph *notchLowH = interpolatedFilter((TGraph*)unfiltH->even(), lowBin-lowSigma, lowBin+lowSigma);
     TGraph *notchHighH = interpolatedFilter(notchLowH,highBin-highSigma,highBin+highSigma);
     AnalysisWaveform *notchedH = AnalysisWaveform::makeWf(notchHighH);
@@ -110,6 +112,6 @@ void interpolatedNotchFilter::process(FilteredAnitaEvent *ev){
     //cout<<"notched"<<endl;
   }
 }
-void interpolatedNotchFilter::processOne(AnalysisWaveform *wf, const RawAnitaHeader *,int, int){
+void pueo::InterpolatedNotchFilter::processOne(AnalysisWaveform *wf, const RawHeader *,int, int){
   cout<<"not implemented"<<'\n';
 }

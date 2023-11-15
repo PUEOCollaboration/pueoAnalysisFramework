@@ -1,4 +1,4 @@
-#include "AnalysisWaveform.h" 
+#include "pueo/AnalysisWaveform.h" 
 #include "FFTtools.h" 
 #include "TAxis.h"
 #include "RFInterpolate.h" 
@@ -19,8 +19,8 @@
 static VEC INDEX(0,1,2,3); 
 #endif
 
-AnalysisWaveform::InterpolationType AnalysisWaveform::defaultInterpolationType = AnalysisWaveform::AKIMA; 
-AnalysisWaveform::InterpolationOptions AnalysisWaveform::defaultInterpolationOptions; 
+pueo::AnalysisWaveform::InterpolationType pueo::AnalysisWaveform::defaultInterpolationType = pueo::AnalysisWaveform::AKIMA; 
+pueo::AnalysisWaveform::InterpolationOptions pueo::AnalysisWaveform::defaultInterpolationOptions; 
 
 
 /* Branch prediction help macros. Not sure if these work with clang */ 
@@ -29,16 +29,16 @@ AnalysisWaveform::InterpolationOptions AnalysisWaveform::defaultInterpolationOpt
 
 const int minPointsForGslInterp = 6;
 
-#ifdef ANITA_ANALYSIS_DEBUG
+#ifdef PUEO_ANALYSIS_DEBUG
 static bool DEBUGON = false; 
-void AnalysisWaveform::enableDebug(bool debug) { DEBUGON = debug; } 
+void pueo::AnalysisWaveform::enableDebug(bool debug) { DEBUGON = debug; } 
 #else
-void AnalysisWaveform::enableDebug(bool debug) { fprintf(stderr, "enableDebug(%d) ineffective without ANITA_ANALYSIS_DEBUG defined\n", debug); } 
+void pueo::AnalysisWaveform::enableDebug(bool debug) { fprintf(stderr, "enableDebug(%d) ineffective without PUEO_ANALYSIS_DEBUG defined\n", debug); } 
 #endif 
 
 
 static bool ALLOW_EVEN_TO_UNEVEN = false; 
-void AnalysisWaveform::allowEvenToUnevenConversion( bool allow) { ALLOW_EVEN_TO_UNEVEN = allow; }
+void pueo::AnalysisWaveform::allowEvenToUnevenConversion( bool allow) { ALLOW_EVEN_TO_UNEVEN = allow; }
 
 
 static __thread bool nag_if_not_zero_padded = false; 
@@ -81,7 +81,7 @@ static void fillEven(int N, double * x, double dt, double t0)
 }
 
 
-static void setNewSize(TGraphAligned * g, int size )
+static void setNewSize(pueo::TGraphAligned * g, int size )
 {
   int old_size = g->GetN(); 
   g->Set(size); 
@@ -95,7 +95,7 @@ static void setNewSize(TGraphAligned * g, int size )
 
 static int complaints = 0; 
 
-AnalysisWaveform::AnalysisWaveform(int N, const double *x, const double * y, double nominal_dt,
+pueo::AnalysisWaveform::AnalysisWaveform(int N, const double *x, const double * y, double nominal_dt,
                                    InterpolationType interp_type, InterpolationOptions *opt)
   : g_uneven(N,x,y),  dt(nominal_dt), fft(0), theEvenAkimaInterpolator(0,ROOT::Math::Interpolation::kAKIMA),
     interpolation_type(interp_type), must_update_uneven(false), must_update_freq(true), must_update_even(true), 
@@ -143,7 +143,7 @@ AnalysisWaveform::AnalysisWaveform(int N, const double *x, const double * y, dou
 
 }
 
-AnalysisWaveform::AnalysisWaveform(int N, const double * y, double dt, double t0)
+pueo::AnalysisWaveform::AnalysisWaveform(int N, const double * y, double dt, double t0)
   : g_even(N), dt(dt), fft(0), theEvenAkimaInterpolator(0,ROOT::Math::Interpolation::kAKIMA), 
      interpolation_type(AKIMA), must_update_uneven(false), must_update_freq(true), must_update_even(false),
      uneven_equals_even(true), hilbert_transform(0), force_even_size(0)
@@ -165,7 +165,7 @@ AnalysisWaveform::AnalysisWaveform(int N, const double * y, double dt, double t0
 }
 
 
-AnalysisWaveform::AnalysisWaveform(int N, double dt, double t0)
+pueo::AnalysisWaveform::AnalysisWaveform(int N, double dt, double t0)
   : g_even(N), dt(dt), fft(0), theEvenAkimaInterpolator(0,ROOT::Math::Interpolation::kAKIMA), 
     interpolation_type(AKIMA), must_update_uneven(false), must_update_freq(true),
     must_update_even(false), uneven_equals_even(true), hilbert_transform(0), force_even_size(0)
@@ -188,7 +188,7 @@ AnalysisWaveform::AnalysisWaveform(int N, double dt, double t0)
 
 }
 
-AnalysisWaveform::AnalysisWaveform(int N, const FFTWComplex * f, double df, double t0)
+pueo::AnalysisWaveform::AnalysisWaveform(int N, const FFTWComplex * f, double df, double t0)
   :  g_even(N), df(df), theEvenAkimaInterpolator(0,ROOT::Math::Interpolation::kAKIMA), interpolation_type(AKIMA), 
      must_update_uneven(false), must_update_freq(false), must_update_even(true), uneven_equals_even(true), 
      hilbert_transform(0), force_even_size(0)
@@ -217,7 +217,7 @@ AnalysisWaveform::AnalysisWaveform(int N, const FFTWComplex * f, double df, doub
 
 
 
-const TGraphAligned * AnalysisWaveform::uneven() const
+const pueo::TGraphAligned * pueo::AnalysisWaveform::uneven() const
 {
 
   if (uneven_equals_even) return even(); 
@@ -225,10 +225,10 @@ const TGraphAligned * AnalysisWaveform::uneven() const
   return &g_uneven; 
 }
 
-const TGraphAligned * AnalysisWaveform::even()  const
+const pueo::TGraphAligned * pueo::AnalysisWaveform::even()  const
 {
 
-#ifdef ANITA_ANALYSIS_DEBUG
+#ifdef PUEO_ANALYSIS_DEBUG
   if (DEBUGON) printf("Called even()!\n"); 
   if (DEBUGON) printf ("[%p]: \tmust_update_even=%d, must_update_freq=%d, must_update_uneven=%d\n", this, must_update_even, must_update_freq, must_update_uneven); 
   //kaboom 
@@ -247,11 +247,11 @@ const TGraphAligned * AnalysisWaveform::even()  const
   return &g_even; 
 }
 
-const FFTWComplex * AnalysisWaveform::freq()  const
+const FFTWComplex * pueo::AnalysisWaveform::freq()  const
 {
 
 
-#ifdef ANITA_ANALYSIS_DEBUG
+#ifdef PUEO_ANALYSIS_DEBUG
   if (DEBUGON) printf("Called freq()!\n"); 
   if (DEBUGON) printf ("[%p] \tmust_update_even=%d, must_update_freq=%d, must_update_uneven=%d\n", this, must_update_even, must_update_freq, must_update_uneven); 
 #endif
@@ -267,10 +267,10 @@ const FFTWComplex * AnalysisWaveform::freq()  const
 
 
 
-void AnalysisWaveform::updateEven(const TGraph * replace)
+void pueo::AnalysisWaveform::updateEven(const TGraph * replace)
 {
 
-#ifdef ANITA_ANALYSIS_DEBUG
+#ifdef PUEO_ANALYSIS_DEBUG
   if (DEBUGON) printf("Called updateEven(replace)!\n"); 
   if (DEBUGON) printf ("[%p] \tmust_update_even=%d, must_update_freq=%d, must_update_uneven=%d\n", this, must_update_even, must_update_freq, must_update_uneven); 
 #endif
@@ -291,10 +291,10 @@ void AnalysisWaveform::updateEven(const TGraph * replace)
 }
 
 
-TGraphAligned * AnalysisWaveform::updateEven()
+pueo::TGraphAligned * pueo::AnalysisWaveform::updateEven()
 {
 
-#ifdef ANITA_ANALYSIS_DEBUG
+#ifdef PUEO_ANALYSIS_DEBUG
   if (DEBUGON) printf("Called updateEven()!\n"); 
   if (DEBUGON) printf ("\tmust_update_even=%d, must_update_freq=%d, must_update_uneven=%d\n", must_update_even, must_update_freq, must_update_uneven); 
 #endif 
@@ -310,9 +310,9 @@ TGraphAligned * AnalysisWaveform::updateEven()
   return ev; 
 }
 
-TGraphAligned * AnalysisWaveform::updateUneven()
+pueo::TGraphAligned * pueo::AnalysisWaveform::updateUneven()
 {
-#ifdef ANITA_ANALYSIS_DEBUG
+#ifdef PUEO_ANALYSIS_DEBUG
   if (DEBUGON) printf("Called updateUneven()!\n"); 
   if (DEBUGON) printf ("[%p]: \tmust_update_even=%d, must_update_freq=%d, must_update_uneven=%d\n",this, must_update_even, must_update_freq, must_update_uneven); 
 #endif
@@ -328,9 +328,9 @@ TGraphAligned * AnalysisWaveform::updateUneven()
   return g; 
 }
 
-FFTWComplex * AnalysisWaveform::updateFreq() 
+FFTWComplex * pueo::AnalysisWaveform::updateFreq() 
 {
-#ifdef ANITA_ANALYSIS_DEBUG
+#ifdef PUEO_ANALYSIS_DEBUG
   if (DEBUGON) printf("Called updateFreq()!\n"); 
   if (DEBUGON) printf ("[%p]: \tmust_update_even=%d, must_update_freq=%d, must_update_uneven=%d\n",this, must_update_even, must_update_freq, must_update_uneven); 
 #endif
@@ -357,28 +357,28 @@ FFTWComplex * AnalysisWaveform::updateFreq()
 #define DO_FOR_TIME(THING)  g_uneven.THING; g_hilbert_envelope.THING; g_even.THING;
 #define DO_FOR_FREQ(THING)  g_power.THING; g_power_db.THING; g_phase.THING; g_group_delay.THING; 
 
-void AnalysisWaveform::setColor(int c) 
+void pueo::AnalysisWaveform::setColor(int c) 
 {
   DO_FOR_ALL(SetLineColor(c)); 
   DO_FOR_ALL(SetMarkerColor(c)); 
 }
 
-void AnalysisWaveform::setTitle(const char * title) 
+void pueo::AnalysisWaveform::setTitle(const char * title) 
 {
   DO_FOR_ALL(SetTitle(title)); 
 }
 
-void AnalysisWaveform::setFreqDisplayRange(double l, double h)
+void pueo::AnalysisWaveform::setFreqDisplayRange(double l, double h)
 {
   DO_FOR_FREQ(GetXaxis()->SetRangeUser(l,h)); 
 }
 
-void AnalysisWaveform::setTimeDisplayRange(double l, double h)
+void pueo::AnalysisWaveform::setTimeDisplayRange(double l, double h)
 {
   DO_FOR_TIME(GetXaxis()->SetRangeUser(l,h)); 
 }
 
-void AnalysisWaveform::setWidth(int w) 
+void pueo::AnalysisWaveform::setWidth(int w) 
 {
   DO_FOR_ALL(SetLineWidth(w)); 
 
@@ -387,10 +387,10 @@ void AnalysisWaveform::setWidth(int w)
 
 
 
-void AnalysisWaveform::updateUneven(const TGraph * replace)
+void pueo::AnalysisWaveform::updateUneven(const TGraph * replace)
 {
 
-#ifdef ANITA_ANALYSIS_DEBUG
+#ifdef PUEO_ANALYSIS_DEBUG
   if (DEBUGON) printf("Called updateUneven(replace)!\n"); 
   if (DEBUGON) printf ("[%p]: \tmust_update_even=%d, must_update_freq=%d, must_update_uneven=%d\n",this, must_update_even, must_update_freq, must_update_uneven); 
 #endif
@@ -408,7 +408,7 @@ void AnalysisWaveform::updateUneven(const TGraph * replace)
   even_akima_interpolator_dirty = true; 
 }
 
-void AnalysisWaveform::calculateUnevenFromEven() const
+void pueo::AnalysisWaveform::calculateUnevenFromEven() const
 {
   const TGraphAligned * g = even(); 
 
@@ -437,7 +437,7 @@ void AnalysisWaveform::calculateUnevenFromEven() const
   must_update_uneven = false; 
 }
 
-const ROOT::Math::Interpolator * AnalysisWaveform::evenAkimaInterpolator() const
+const ROOT::Math::Interpolator * pueo::AnalysisWaveform::evenAkimaInterpolator() const
 {
 
   if (even_akima_interpolator_dirty) 
@@ -455,7 +455,7 @@ const ROOT::Math::Interpolator * AnalysisWaveform::evenAkimaInterpolator() const
   return &theEvenAkimaInterpolator; 
 }
 
-void AnalysisWaveform::calculateEvenFromUneven()  const
+void pueo::AnalysisWaveform::calculateEvenFromUneven()  const
 {
 
 
@@ -517,7 +517,7 @@ void AnalysisWaveform::calculateEvenFromUneven()  const
   must_update_even = false; 
 }
 
-void AnalysisWaveform::calculateEvenFromFreq() const
+void pueo::AnalysisWaveform::calculateEvenFromFreq() const
 {
   FFTtools::doInvFFTNoClobber(g_even.GetN(), fft, g_even.GetY()); 
 
@@ -538,7 +538,7 @@ void AnalysisWaveform::calculateEvenFromFreq() const
   must_update_even = false; 
 }
 
-void AnalysisWaveform::calculateFreqFromEven() const
+void pueo::AnalysisWaveform::calculateFreqFromEven() const
 {
 
   const TGraphAligned * g = even();  // in case it must be converted from uneven
@@ -576,10 +576,10 @@ void AnalysisWaveform::calculateFreqFromEven() const
 
 
 
-void AnalysisWaveform::updateFreq(int new_N, const FFTWComplex * new_fft, double new_df )
+void pueo::AnalysisWaveform::updateFreq(int new_N, const FFTWComplex * new_fft, double new_df )
 {
 
-#ifdef ANITA_ANALYSIS_DEBUG
+#ifdef PUEO_ANALYSIS_DEBUG
   if (DEBUGON) printf("Called updateFreq(replace)!\n"); 
   if (DEBUGON) printf ("[%p]: \tmust_update_even=%d, must_update_freq=%d, must_update_uneven=%d\n",this, must_update_even, must_update_freq, must_update_uneven); 
 #endif
@@ -614,7 +614,7 @@ void AnalysisWaveform::updateFreq(int new_N, const FFTWComplex * new_fft, double
   just_padded = false; 
 }
 
-const TGraphAligned * AnalysisWaveform::phase() const
+const pueo::TGraphAligned * pueo::AnalysisWaveform::phase() const
 {
   const FFTWComplex * the_fft = freq(); //will update if necessary
   if (phase_dirty)
@@ -632,7 +632,7 @@ const TGraphAligned * AnalysisWaveform::phase() const
   return &g_phase; 
 }
 
-const TGraphAligned * AnalysisWaveform::groupDelay() const
+const pueo::TGraphAligned * pueo::AnalysisWaveform::groupDelay() const
 {
   if (group_delay_dirty)
   {
@@ -657,7 +657,7 @@ const TGraphAligned * AnalysisWaveform::groupDelay() const
   return &g_group_delay; 
 }
 
-const TGraphAligned * AnalysisWaveform::powerdB() const
+const pueo::TGraphAligned * pueo::AnalysisWaveform::powerdB() const
 {
   const TGraphAligned * the_power = power(); //will update if necessary
   if (power_db_dirty)
@@ -672,7 +672,7 @@ const TGraphAligned * AnalysisWaveform::powerdB() const
 }
 
 
-const AnalysisWaveform * AnalysisWaveform::hilbertTransform() const 
+const pueo::AnalysisWaveform * pueo::AnalysisWaveform::hilbertTransform() const 
 {
 
   (void) freq(); 
@@ -697,7 +697,7 @@ const AnalysisWaveform * AnalysisWaveform::hilbertTransform() const
   return hilbert_transform; 
 }
 
-const TGraphAligned * AnalysisWaveform::hilbertEnvelope() const
+const pueo::TGraphAligned * pueo::AnalysisWaveform::hilbertEnvelope() const
 {
   const TGraphAligned * the_even = even(); 
 
@@ -720,7 +720,7 @@ const TGraphAligned * AnalysisWaveform::hilbertEnvelope() const
   return &g_hilbert_envelope; 
 }
 
-const TGraphAligned * AnalysisWaveform::power() const
+const pueo::TGraphAligned * pueo::AnalysisWaveform::power() const
 {
 
   if (power_dirty)
@@ -762,7 +762,7 @@ const TGraphAligned * AnalysisWaveform::power() const
   return &g_power; 
 }
 
-AnalysisWaveform::~AnalysisWaveform() 
+pueo::AnalysisWaveform::~AnalysisWaveform() 
 {
   if (fft) 
   {
@@ -774,7 +774,7 @@ AnalysisWaveform::~AnalysisWaveform()
 
 }
 
-void AnalysisWaveform::forceEvenSize(int size)
+void pueo::AnalysisWaveform::forceEvenSize(int size)
 {
   if (must_update_even)  //defer 
   {
@@ -785,7 +785,7 @@ void AnalysisWaveform::forceEvenSize(int size)
 
 }
 
-void AnalysisWaveform::evalEven(int N, const double * __restrict t, double * __restrict v, EvenEvaluationType type)  const
+void pueo::AnalysisWaveform::evalEven(int N, const double * __restrict t, double * __restrict v, EvenEvaluationType type)  const
 {
 
   if (type == EVAL_LINEAR) 
@@ -915,7 +915,7 @@ void AnalysisWaveform::evalEven(int N, const double * __restrict t, double * __r
 
 }
 
-double AnalysisWaveform::evalEven(double t, EvenEvaluationType typ)  const
+double pueo::AnalysisWaveform::evalEven(double t, EvenEvaluationType typ)  const
 {
   if (typ == EVAL_AKIMA) 
   {
@@ -947,7 +947,7 @@ double AnalysisWaveform::evalEven(double t, EvenEvaluationType typ)  const
   return 0; 
 }
 
-AnalysisWaveform & AnalysisWaveform::operator=(const AnalysisWaveform & other) 
+pueo::AnalysisWaveform & pueo::AnalysisWaveform::operator=(const AnalysisWaveform & other) 
 {
   if (this != &other) 
   {
@@ -995,7 +995,7 @@ AnalysisWaveform & AnalysisWaveform::operator=(const AnalysisWaveform & other)
   return *this; 
 }
 
-AnalysisWaveform::AnalysisWaveform(const AnalysisWaveform & other) 
+pueo::AnalysisWaveform::AnalysisWaveform(const AnalysisWaveform & other) 
   :
   g_uneven(other.uneven_equals_even ? 0 : other.g_uneven.GetN()), 
   g_even(other.Neven()) 
@@ -1064,7 +1064,7 @@ AnalysisWaveform::AnalysisWaveform(const AnalysisWaveform & other)
 }
 
 
-AnalysisWaveform * AnalysisWaveform::convolution(const AnalysisWaveform *A, const AnalysisWaveform *B, int npad, double scale) 
+pueo::AnalysisWaveform * pueo::AnalysisWaveform::convolution(const AnalysisWaveform *A, const AnalysisWaveform *B, int npad, double scale) 
 {
   if (A->Nfreq() != B->Nfreq()) 
   {
@@ -1113,7 +1113,7 @@ AnalysisWaveform * AnalysisWaveform::convolution(const AnalysisWaveform *A, cons
 }
 
 
-AnalysisWaveform * AnalysisWaveform::correlation(const AnalysisWaveform *A, const AnalysisWaveform *B, int npad, double scale, int window_normalize) 
+pueo::AnalysisWaveform * pueo::AnalysisWaveform::correlation(const AnalysisWaveform *A, const AnalysisWaveform *B, int npad, double scale, int window_normalize) 
 {
   if (A->Nfreq() != B->Nfreq()) 
   {
@@ -1217,7 +1217,7 @@ AnalysisWaveform * AnalysisWaveform::correlation(const AnalysisWaveform *A, cons
   return answer; 
 }
 
-void AnalysisWaveform::padFreq(int npad)
+void pueo::AnalysisWaveform::padFreq(int npad)
 {
   if (npad < 1) return; 
 
@@ -1270,7 +1270,7 @@ void AnalysisWaveform::padFreq(int npad)
 
 
 
-void AnalysisWaveform::padFreqAdd(int npad)
+void pueo::AnalysisWaveform::padFreqAdd(int npad)
 {
   if (npad < 1) return; 
 
@@ -1326,14 +1326,14 @@ void AnalysisWaveform::padFreqAdd(int npad)
 }
 
 
-void AnalysisWaveform::setPowerCalculationOptions(PowerCalculationOptions & opt) 
+void pueo::AnalysisWaveform::setPowerCalculationOptions(PowerCalculationOptions & opt) 
 {
   power_options = opt; 
   power_dirty = true; 
   power_db_dirty = true; 
 }
 
-void AnalysisWaveform::padEven(int npad, int where)
+void pueo::AnalysisWaveform::padEven(int npad, int where)
 {
   if (npad < 1) return; 
   TGraphAligned * g = updateEven(); 
@@ -1383,7 +1383,7 @@ void AnalysisWaveform::padEven(int npad, int where)
   if (npad >= 1) just_padded = true; 
 }
 
-bool AnalysisWaveform::checkIfPaddedInTime() const 
+bool pueo::AnalysisWaveform::checkIfPaddedInTime() const 
 {
   if (just_padded) return true; 
 
@@ -1397,9 +1397,9 @@ bool AnalysisWaveform::checkIfPaddedInTime() const
   return true; 
 }
 
-static void doDraw(const TGraphAligned * cg,const char * opt,  int color)
+static void doDraw(const pueo::TGraphAligned * cg,const char * opt,  int color)
 {
-  TGraphAligned * g = (TGraphAligned*) cg; 
+  pueo::TGraphAligned * g = (pueo::TGraphAligned*) cg; 
 
   if (color >= 0) 
   {
@@ -1410,22 +1410,22 @@ static void doDraw(const TGraphAligned * cg,const char * opt,  int color)
 }
 
 
-void AnalysisWaveform::drawEven(const char * opt, int color) const{ doDraw(even(),opt,color); }
-void AnalysisWaveform::drawUneven(const char * opt, int color) const{ doDraw(uneven(),opt,color); }
-void AnalysisWaveform::drawPower(const char * opt, int color)const { doDraw(power(),opt,color); }
-void AnalysisWaveform::drawPowerdB(const char * opt, int color)const { doDraw(powerdB(),opt,color); }
-void AnalysisWaveform::drawPhase(const char * opt, int color) const{ doDraw(phase(),opt,color); }
-void AnalysisWaveform::drawHilbertEnvelope(const char * opt, int color) const{ doDraw(hilbertEnvelope(),opt,color); }
+void pueo::AnalysisWaveform::drawEven(const char * opt, int color) const{ doDraw(even(),opt,color); }
+void pueo::AnalysisWaveform::drawUneven(const char * opt, int color) const{ doDraw(uneven(),opt,color); }
+void pueo::AnalysisWaveform::drawPower(const char * opt, int color)const { doDraw(power(),opt,color); }
+void pueo::AnalysisWaveform::drawPowerdB(const char * opt, int color)const { doDraw(powerdB(),opt,color); }
+void pueo::AnalysisWaveform::drawPhase(const char * opt, int color) const{ doDraw(phase(),opt,color); }
+void pueo::AnalysisWaveform::drawHilbertEnvelope(const char * opt, int color) const{ doDraw(hilbertEnvelope(),opt,color); }
 
 
-int AnalysisWaveform::Nfreq() const
+int pueo::AnalysisWaveform::Nfreq() const
 {
   (void) freq(); 
   return fft_len;  
 }
 
 
-void AnalysisWaveform::basisChange(AnalysisWaveform * __restrict x, 
+void pueo::AnalysisWaveform::basisChange(AnalysisWaveform * __restrict x, 
     AnalysisWaveform * __restrict y)  {
 
 
@@ -1459,7 +1459,7 @@ void AnalysisWaveform::basisChange(AnalysisWaveform * __restrict x,
 }
 
 
-void AnalysisWaveform::sumDifference( AnalysisWaveform * __restrict x, AnalysisWaveform * __restrict y) 
+void pueo::AnalysisWaveform::sumDifference( AnalysisWaveform * __restrict x, AnalysisWaveform * __restrict y) 
 {
   int N = TMath::Min(x->Neven(), y->Neven()); 
 
@@ -1485,7 +1485,7 @@ void AnalysisWaveform::sumDifference( AnalysisWaveform * __restrict x, AnalysisW
 }
 
 
-void AnalysisWaveform::flipHV( AnalysisWaveform * __restrict x, AnalysisWaveform * __restrict y) 
+void pueo::AnalysisWaveform::flipHV( AnalysisWaveform * __restrict x, AnalysisWaveform * __restrict y) 
 {
   int N = TMath::Min(x->Neven(), y->Neven()); 
 
@@ -1511,7 +1511,7 @@ void AnalysisWaveform::flipHV( AnalysisWaveform * __restrict x, AnalysisWaveform
 }
 
 
-AnalysisWaveform * AnalysisWaveform::autoCorrelation(int npadtime, int npadfreq, double scale) 
+pueo::AnalysisWaveform * pueo::AnalysisWaveform::autoCorrelation(int npadtime, int npadfreq, double scale) 
 {
 
   if (npadtime)
@@ -1524,7 +1524,7 @@ AnalysisWaveform * AnalysisWaveform::autoCorrelation(int npadtime, int npadfreq,
   return correlation(this,this,npadfreq,scale); 
 }
 
-void AnalysisWaveform::zeroMeanEven()
+void pueo::AnalysisWaveform::zeroMeanEven()
 {
   TGraphAligned * g = updateEven(); 
 
@@ -1535,13 +1535,13 @@ void AnalysisWaveform::zeroMeanEven()
   }
 }
 
-void AnalysisWaveform::setCorrelationNag(bool nag) 
+void pueo::AnalysisWaveform::setCorrelationNag(bool nag) 
 {
 
   nag_if_not_zero_padded = nag; 
 }
 
-void AnalysisWaveform::nameGraphs() 
+void pueo::AnalysisWaveform::nameGraphs() 
 {
 #ifdef USE_OMP
 #pragma omp critical 
@@ -1576,7 +1576,7 @@ void AnalysisWaveform::nameGraphs()
 }
 
 
-double AnalysisWaveform::getRMS() const
+double pueo::AnalysisWaveform::getRMS() const
 {
   // do it with the even waveform if we can! 
 
@@ -1609,7 +1609,7 @@ double AnalysisWaveform::getRMS() const
   return sqrt(sum2/2)/(N-1);  
 }
 
-AnalysisWaveform * AnalysisWaveform::makeWf(const TGraph * g, bool even, AnalysisWaveform *wf) 
+pueo::AnalysisWaveform * pueo::AnalysisWaveform::makeWf(const TGraph * g, bool even, AnalysisWaveform *wf) 
 {
 
   double dt0 = g->GetX()[1]-g->GetX()[0]; 

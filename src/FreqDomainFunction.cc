@@ -1,11 +1,11 @@
-#include "FreqDomainFunction.h" 
+#include "pueo/FreqDomainFunction.h" 
 
 #include "FFTtools.h" 
 #include "FFTWComplex.h" 
 
 
-FreqDomainFunction::FreqDomainFunction (  std::complex<double> (*fn) (double f, const double * pars), 
-        int npars, const AnitaResponse::AbstractResponse * r,  double dt , double tmin, double tmax, bool shift )
+pueo::FreqDomainFunction::FreqDomainFunction (  std::complex<double> (*fn) (double f, const double * pars), 
+        int npars, const AbstractResponse * r,  double dt , double tmin, double tmax, bool shift )
 : do_shift(shift), t0(tmin), t1(tmax),  the_fn(fn), pars(npars+2), response(r), wf ( 1+(tmax-tmin)/dt, dt, tmin)
 {
   wf_init = false; 
@@ -16,7 +16,7 @@ FreqDomainFunction::FreqDomainFunction (  std::complex<double> (*fn) (double f, 
   dedisperse_response = false;
 }
 
-std::complex<double>* FreqDomainFunction::makeCausal(int N, const std::complex<double> *in, int how, std::complex<double> * out) 
+std::complex<double>* pueo::FreqDomainFunction::makeCausal(int N, const std::complex<double> *in, int how, std::complex<double> * out) 
 {
   double * real = 0;
   double * imag = 0;
@@ -66,7 +66,7 @@ std::complex<double>* FreqDomainFunction::makeCausal(int N, const std::complex<d
 
 
 
-void FreqDomainFunction::setParameters(const double * p) 
+void pueo::FreqDomainFunction::setParameters(const double * p) 
 {
   if (p == 0) return; 
 
@@ -120,14 +120,14 @@ void FreqDomainFunction::setParameters(const double * p)
   }
 }
 
-double FreqDomainFunction::eval(double x, const double * p) 
+double pueo::FreqDomainFunction::eval(double x, const double * p) 
 {
   //see if we need to update wf
   setParameters(p); 
   return pars[0] * wf.evalEven(x-pars[1]) * wf.Nfreq(); 
 }
 
-std::complex<double> FreqDomainFunction::evalFreq(double f, const double * p) 
+std::complex<double> pueo::FreqDomainFunction::evalFreq(double f, const double * p) 
 {
   //see if we need to update wf
   setParameters(p); 
@@ -145,12 +145,12 @@ std::complex<double> FreqDomainFunction::evalFreq(double f, const double * p)
   return avg * pars[0] * std::exp(std::complex<double>(0,-pars[1]*TMath::Pi()*2*f)); 
 }
 
-double FreqDomainFunction::evalPhase(double f, const double * p) 
+double pueo::FreqDomainFunction::evalPhase(double f, const double * p) 
 {
   return std::arg(evalFreq(f,p)); 
 }
 
-double FreqDomainFunction::evalPower(double f, const double * p) 
+double pueo::FreqDomainFunction::evalPower(double f, const double * p) 
 {
   setParameters(p); 
   double df = wf.deltaF(); 

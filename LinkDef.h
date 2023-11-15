@@ -4,73 +4,72 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class AnitaEventReconstructor+;
-#pragma link C++ class AnitaEventSummary+;
-#pragma link C++ class AnitaEventSummary::PointingHypothesis+;
-#pragma link C++ class AnitaEventSummary::WaveformInfo+;
-#pragma link C++ class AnitaEventSummary::ChannelInfo+;
-#pragma link C++ class AnitaEventSummary::EventFlags+;
-#pragma link C++ class AnitaEventSummary::SourceHypothesis+;
-#pragma link C++ class AnitaEventSummary::MCTruth+;
-#pragma link C++ class AnitaEventSummary::PayloadLocation+;
-#pragma link C++ class FilteredAnitaEvent+;
-#pragma link C++ class FilterStrategy+;
-#pragma link C++ class AnalysisWaveform+;
-#pragma link C++ class AnalysisWaveform::PowerCalculationOptions;
-#pragma link C++ class PrettyAnalysisWaveform+;
-#pragma link C++ class TGraphAligned+;
-#pragma link C++ class CorrelationSummaryAnita4+;
+#pragma link C++ namespace pueo; 
 
-#pragma link C++ class AnitaTemplateSummary+;
-#pragma link C++ class AnitaTemplateSummary::SingleTemplateResult+;
-#pragma link C++ class AnitaTemplateMachine+;
+#pragma link C++ class pueo::EventReconstructor+;
+#pragma link C++ class pueo::EventSummary+;
+#pragma link C++ class pueo::EventSummary::PointingHypothesis+;
+#pragma link C++ class pueo::EventSummary::WaveformInfo+;
+#pragma link C++ class pueo::EventSummary::ChannelInfo+;
+#pragma link C++ class pueo::EventSummary::EventFlags+;
+#pragma link C++ class pueo::EventSummary::SourceHypothesis+;
+#pragma link C++ class pueo::EventSummary::MCTruth+;
+#pragma link C++ class pueo::EventSummary::PayloadLocation+;
+#pragma link C++ class pueo::FilteredEvent+;
+#pragma link C++ class pueo::FilterStrategy+;
+#pragma link C++ class pueo::AnalysisWaveform+;
+#pragma link C++ class pueo::AnalysisWaveform::PowerCalculationOptions;
+#pragma link C++ class pueo::PrettyAnalysisWaveform+;
+#pragma link C++ class pueo::TGraphAligned+;
+//#pragma link C++ class CorrelationSummaryAnita4+;
 
-#pragma link C++ class AnitaNoiseSummary+;
-#pragma link C++ class NoiseMonitor+;
+#pragma link C++ class pueo::TemplateSummary+;
+#pragma link C++ class pueo::TemplateSummary::SingleTemplateResult+;
+#pragma link C++ class pueo::TemplateMachine+;
 
-#pragma link C++ class FilterOperation+;
-#pragma link C++ class UniformFilterOperation+;
-#pragma link C++ class ConditionalFilterOperation+;
-#pragma link C++ class SimplePassBandFilter+;
-#pragma link C++ class SimpleNotchFilter+;
-#pragma link C++ class ALFASincFilter+;
-#pragma link C++ class ALFAButterworthFilter+;
-#pragma link C++ class ALFALanczosFilter+;
-#pragma link C++ class HybridFilter+;
-#pragma link C++ class SumDifferenceFilter+;
-#pragma link C++ class DigitalFilterOperation+;
-#pragma link C++ class GeometricFilter+;
-#pragma link C++ class GaussianTaper; 
-#pragma link C++ class DiodeFilter; 
-#pragma link C++ class DeglitchFilter+;
-#pragma link C++ class interpolatedNotchFilter; 
+#pragma link C++ class pueo::NoiseSummary+;
+#pragma link C++ class pueo::NoiseMonitor+;
 
-#pragma link C++ namespace AnitaResponse+;
-#pragma link C++ namespace impulsivity+;
-#pragma link C++ namespace bandwidth+;
+#pragma link C++ class pueo::FilterOperation+;
+#pragma link C++ class pueo::UniformFilterOperation+;
+#pragma link C++ class pueo::ConditionalFilterOperation+;
+#pragma link C++ class pueo::SimplePassBandFilter+;
+#pragma link C++ class pueo::SimpleNotchFilter+;
+#pragma link C++ class pueo::HybridFilter+;
+#pragma link C++ class pueo::SumDifferenceFilter+;
+#pragma link C++ class pueo::DigitalFilterOperation+;
+#pragma link C++ class pueo::GeometricFilter+;
+#pragma link C++ class pueo::GaussianTaper; 
+#pragma link C++ class pueo::DiodeFilter; 
+#pragma link C++ class pueo::DeglitchFilter+;
+#pragma link C++ class pueo::InterpolatedNotchFilter; 
 
-#pragma link C++ namespace polarimetry+;
-#pragma link C++ class polarimetry::StokesAnalysis;
+#pragma link C++ namespace pueo::Response+;
+#pragma link C++ namespace pueo::impulsivity+;
+#pragma link C++ namespace pueo::bandwidth+;
 
-#pragma link C++ class AnitaResponse::DeconvolutionMethod+;
-#pragma link C++ class AnitaResponse::NaiveDeconvolution+;
-#pragma link C++ class AnitaResponse::BandLimitedDeconvolution+;
-#pragma link C++ class AnitaResponse::CLEANDeconvolution+;
-#pragma link C++ class AnitaResponse::AbstractResponse+;
-#pragma link C++ class AnitaResponse::Response+;
-#pragma link C++ class AnitaResponse::ResponseManager+;
-#pragma link C++ class AnitaResponse::CompositeResponse+;
+#pragma link C++ namespace pueo::polarimetry+;
+#pragma link C++ class pueo::polarimetry::StokesAnalysis;
 
-#pragma link C++ class AnitaResponse::DeconvolveFilter+;
-#pragma link C++ class AnitaResponse::WienerDeconvolution+; 
-#pragma link C++ class AnitaResponse::AllPassDeconvolution+; 
-#pragma link C++ class AnitaResponse::ImpulseResponseXCorr+; 
-#pragma link C++ class AnitaResponse::CLEAN+; 
-#pragma link C++ class AnitaResponse::DeconvolutionMethod+;
+#pragma link C++ class pueo::DeconvolutionMethod+;
+#pragma link C++ class pueo::NaiveDeconvolution+;
+#pragma link C++ class pueo::BandLimitedDeconvolution+;
+#pragma link C++ class pueo::CLEANDeconvolution+;
+#pragma link C++ class pueo::AbstractResponse+;
+#pragma link C++ class pueo::Response+;
+#pragma link C++ class pueo::ResponseManager+;
+#pragma link C++ class pueo::CompositeResponse+;
 
-#pragma link C++ class AnitaEventFaker+; 
-#pragma link C++ class SensitivityCalculator+; 
-#pragma link C++ class FreqDomainFunction+; 
+#pragma link C++ class pueo::DeconvolveFilter+;
+#pragma link C++ class pueo::WienerDeconvolution+; 
+#pragma link C++ class pueo::AllPassDeconvolution+; 
+#pragma link C++ class pueo::ImpulseResponseXCorr+; 
+#pragma link C++ class pueo::CLEAN+; 
+#pragma link C++ class pueo::DeconvolutionMethod+;
+
+#pragma link C++ class pueo::EventFaker+; 
+#pragma link C++ class pueo::SensitivityCalculator+; 
+#pragma link C++ class pueo::FreqDomainFunction+; 
 
 
 #endif

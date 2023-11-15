@@ -1,4 +1,4 @@
-#include "TGraphAligned.h" 
+#include "pueo/TGraphAligned.h" 
 
 #include <stdlib.h>
 #include "TMath.h"
@@ -11,18 +11,18 @@
 static int err = 0; // error checking for posix_memalign
 
 
-ClassImp(TGraphAligned); 
+ClassImp(pueo::TGraphAligned); 
 
 #define ALIGNMENT TGRAPH_ALIGNED_ALIGNMENT
 
-TGraphAligned::TGraphAligned()
+pueo::TGraphAligned::TGraphAligned()
   :TGraph()
 {
   SetEditable(0); 
   //don't think we need to do anything in this case. 
 }
 
-TGraphAligned::TGraphAligned(Int_t n)
+pueo::TGraphAligned::TGraphAligned(Int_t n)
 {
   SetTitle("Graph"); 
   SetName("Graph"); 
@@ -33,7 +33,7 @@ TGraphAligned::TGraphAligned(Int_t n)
 }
 
 
-void TGraphAligned::adopt(const TGraphAligned *g) 
+void pueo::TGraphAligned::adopt(const TGraphAligned *g) 
 {
   Set(g->GetN()); 
   memcpy(fX,g->GetX(),GetN()*sizeof(double)); 
@@ -41,7 +41,7 @@ void TGraphAligned::adopt(const TGraphAligned *g)
 }
 
 
-TGraphAligned& TGraphAligned::operator=(const TGraphAligned &gr)
+pueo::TGraphAligned& pueo::TGraphAligned::operator=(const TGraphAligned &gr)
 {
    // Equal operator for this graph
 
@@ -111,7 +111,7 @@ TGraphAligned& TGraphAligned::operator=(const TGraphAligned &gr)
    return *this;
 }
 
-TGraphAligned::TGraphAligned(Int_t n, const Double_t * x, const Double_t * y)
+pueo::TGraphAligned::TGraphAligned(Int_t n, const Double_t * x, const Double_t * y)
 {
 
   SetTitle("Graph"); 
@@ -133,7 +133,7 @@ TGraphAligned::TGraphAligned(Int_t n, const Double_t * x, const Double_t * y)
 
 
 // I don't think this needs to do everything other than allocate fX and fY since the TGraph constructor should take care of that
-Bool_t TGraphAligned::CtorAllocate() 
+Bool_t pueo::TGraphAligned::CtorAllocate() 
 {
   if (fNpoints <= 0)
   {
@@ -168,7 +168,7 @@ Bool_t TGraphAligned::CtorAllocate()
 }
 
 //same as TGraph except use free instead of delete[] 
-TGraphAligned::~TGraphAligned()
+pueo::TGraphAligned::~TGraphAligned()
 {
    // Graph default destructor.
 
@@ -180,7 +180,7 @@ TGraphAligned::~TGraphAligned()
 
 
 //same as TGraph except use free instead of delete[] 
-void TGraphAligned::CopyAndRelease(Double_t **newarrays, Int_t ibegin, Int_t iend,
+void pueo::TGraphAligned::CopyAndRelease(Double_t **newarrays, Int_t ibegin, Int_t iend,
                             Int_t obegin)
 {
    CopyPoints(newarrays, ibegin, iend, obegin);
@@ -193,7 +193,7 @@ void TGraphAligned::CopyAndRelease(Double_t **newarrays, Int_t ibegin, Int_t ien
    }
 }
 
-TGraphAligned::TGraphAligned(const TGraph &gr)
+pueo::TGraphAligned::TGraphAligned(const TGraph &gr)
    : TGraph(gr) 
 {
    // Copy constructor for this graph
@@ -227,7 +227,7 @@ TGraphAligned::TGraphAligned(const TGraph &gr)
 
 
 //same as TGraph except use memalign instead of new[] 
-Double_t** TGraphAligned::AllocateAlignedArrays(Int_t Narrays, Int_t arraySize)
+Double_t** pueo::TGraphAligned::AllocateAlignedArrays(Int_t Narrays, Int_t arraySize)
 {
   if (arraySize < 0)
   {
@@ -259,7 +259,7 @@ Double_t** TGraphAligned::AllocateAlignedArrays(Int_t Narrays, Int_t arraySize)
 }
 
 
-void TGraphAligned::undBize() 
+void pueo::TGraphAligned::undBize() 
 {
   int n = GetN(); 
 
@@ -270,7 +270,7 @@ void TGraphAligned::undBize()
 }
 
 
-Double_t TGraphAligned::getSumV2(Int_t istart, Int_t iend) const
+Double_t pueo::TGraphAligned::getSumV2(Int_t istart, Int_t iend) const
 {
   aligned_double_v v = GetY(); 
   __builtin_prefetch(v);  // This is really an academic exercise at this point
@@ -290,7 +290,7 @@ Double_t TGraphAligned::getSumV2(Int_t istart, Int_t iend) const
 
 }
 
-void TGraphAligned::getMeanAndRMS(Double_t * mean, Double_t * rms, Int_t istart, Int_t iend) const
+void pueo::TGraphAligned::getMeanAndRMS(Double_t * mean, Double_t * rms, Int_t istart, Int_t iend) const
 {
   aligned_double_v v = GetY(); 
   __builtin_prefetch(v); 
@@ -322,7 +322,7 @@ void TGraphAligned::getMeanAndRMS(Double_t * mean, Double_t * rms, Int_t istart,
 
 
 //TODO, this can be optimized mostly likely
-double * TGraphAligned::getMoments(int N, double origin, double * moment) const
+double * pueo::TGraphAligned::getMoments(int N, double origin, double * moment) const
 {
   if (!moment) moment = new double[N]; 
 
@@ -345,7 +345,7 @@ double * TGraphAligned::getMoments(int N, double origin, double * moment) const
 
 
 
-void TGraphAligned::dBize(double mindB) 
+void pueo::TGraphAligned::dBize(double mindB) 
 {
   int n = GetN(); 
 
@@ -357,7 +357,7 @@ void TGraphAligned::dBize(double mindB)
 
 }
 
-Double_t TGraphAligned::pk2pk(Int_t nth_max, Int_t nth_min, Int_t * location_max, Int_t * location_min, Int_t istart, Int_t iend) const
+Double_t pueo::TGraphAligned::pk2pk(Int_t nth_max, Int_t nth_min, Int_t * location_max, Int_t * location_min, Int_t istart, Int_t iend) const
 {
 
   int start = istart < 0 ? GetN() + istart : istart; 
@@ -433,7 +433,7 @@ Double_t TGraphAligned::pk2pk(Int_t nth_max, Int_t nth_min, Int_t * location_max
   return max-min; 
 }
 
-Double_t TGraphAligned::peakVal(Int_t * location, Int_t istart, Int_t iend, bool use_abs) const
+Double_t pueo::TGraphAligned::peakVal(Int_t * location, Int_t istart, Int_t iend, bool use_abs) const
 {
 
   int start = istart < 0 ? GetN() + istart : istart; 
@@ -459,7 +459,7 @@ Double_t TGraphAligned::peakVal(Int_t * location, Int_t istart, Int_t iend, bool
 
 
 
-TH1 *  TGraphAligned::valueHist(int nbins, const double * w, TH1 * out) const 
+TH1 *  pueo::TGraphAligned::valueHist(int nbins, const double * w, TH1 * out) const 
 {
   if (!out) 
   {
@@ -490,7 +490,7 @@ TH1 *  TGraphAligned::valueHist(int nbins, const double * w, TH1 * out) const
 
    
 
-void TGraphAligned::zeroMean()
+void pueo::TGraphAligned::zeroMean()
 {
   double mean = 0; 
   for (int i = 0; i < GetN(); i++) mean+= GetY()[i]; 
@@ -498,7 +498,7 @@ void TGraphAligned::zeroMean()
   for (int i = 0; i < GetN(); i++) GetY()[i]-=mean;
 }
 
-void TGraphAligned::shift(int nsamp, bool zero) 
+void pueo::TGraphAligned::shift(int nsamp, bool zero) 
 {
 
   //this does the rotation 
@@ -520,7 +520,7 @@ void TGraphAligned::shift(int nsamp, bool zero)
 }
 
 
-void TGraphAligned::setPlottingLimits(double mult, bool sym, double dt) 
+void pueo::TGraphAligned::setPlottingLimits(double mult, bool sym, double dt) 
 {
 
   int imax, imin; 
@@ -546,7 +546,7 @@ void TGraphAligned::setPlottingLimits(double mult, bool sym, double dt)
   }
 }
 
-void TGraphAligned::setBelow(double val, bool abso, double to) 
+void pueo::TGraphAligned::setBelow(double val, bool abso, double to) 
 {
   for (int i = 0; i < GetN(); i++) 
   {

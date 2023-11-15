@@ -1,11 +1,11 @@
 #include "TTree.h"
 #include "TFile.h"
-#include "FilterStrategy.h" 
-#include "FilterOperation.h" 
-#include "FilteredAnitaEvent.h" 
+#include "pueo/FilterStrategy.h" 
+#include "pueo/FilterOperation.h" 
+#include "pueo/FilteredEvent.h" 
 
 
-FilterStrategy::FilterStrategy(TFile * outfile) 
+pueo::FilterStrategy::FilterStrategy(TFile * outfile) 
 {
   started = false;
   f = 0; 
@@ -15,7 +15,7 @@ FilterStrategy::FilterStrategy(TFile * outfile)
 }
 
 
-FilterStrategy::~FilterStrategy() 
+pueo::FilterStrategy::~FilterStrategy() 
 {
 
   done(); 
@@ -30,7 +30,7 @@ FilterStrategy::~FilterStrategy()
 
 }
 
-void FilterStrategy::attachFile(TFile* outfile){
+void pueo::FilterStrategy::attachFile(TFile* outfile){
 
   if(!outfile){
     std::cerr << "Error in " << __PRETTY_FUNCTION__ << ", outfile = " << outfile << std::endl;
@@ -83,7 +83,7 @@ void FilterStrategy::attachFile(TFile* outfile){
 }
 
 
-void FilterStrategy::done() 
+void pueo::FilterStrategy::done() 
 {
   if (f) 
   {
@@ -104,7 +104,7 @@ void FilterStrategy::done()
   }
 }
 
-void FilterStrategy::process(FilteredAnitaEvent * ev) 
+void pueo::FilterStrategy::process(FilteredEvent * ev) 
 {
   started = true; 
   int tree_index = 0; 
@@ -137,7 +137,7 @@ void FilterStrategy::process(FilteredAnitaEvent * ev)
 }
 
 
-void FilterStrategy::addOperation(FilterOperation* fo, bool enable_output, bool own) 
+void pueo::FilterStrategy::addOperation(FilterOperation* fo, bool enable_output, bool own) 
 {
   if (started) 
   {

@@ -1,10 +1,10 @@
-#include "BasicFilters.h"
-#include "AnalysisWaveform.h" 
+#include "pueo/BasicFilters.h"
+#include "pueo/AnalysisWaveform.h" 
 #include "DigitalFilter.h" 
 #include "FFTWComplex.h"
-#include "ResponseManager.h"
+#include "pueo/ResponseManager.h"
 
-void SimplePassBandFilter::processOne(AnalysisWaveform* g, const RawAnitaHeader * header, int ant, int pol) 
+void pueo::SimplePassBandFilter::processOne(AnalysisWaveform* g, const RawHeader * header, int ant, int pol) 
 {
   int nfreq = g->Nfreq(); 
   double df = g->deltaF(); 
@@ -22,7 +22,7 @@ void SimplePassBandFilter::processOne(AnalysisWaveform* g, const RawAnitaHeader 
 }
 
 
-void SimpleNotchFilter::processOne(AnalysisWaveform* g, const RawAnitaHeader * header, int ant, int pol) 
+void pueo::SimpleNotchFilter::processOne(AnalysisWaveform* g, const RawHeader * header, int ant, int pol) 
 {
 //  printf("SimpleNotchFilter::processOne!\n"); 
   int nfreq = g->Nfreq(); 
@@ -40,53 +40,53 @@ void SimpleNotchFilter::processOne(AnalysisWaveform* g, const RawAnitaHeader * h
 }
 
 
-void HybridFilter::process(FilteredAnitaEvent * event) {
+void pueo::HybridFilter::process(FilteredEvent * event) {
 
 #ifdef USE_OMP
 #pragma omp  parallel for 
 #endif
 
-  for (int i = 0; i < NUM_SEAVEYS; i++) AnalysisWaveform::basisChange(getWf(event,i, AnitaPol::kHorizontal), getWf(event,i,AnitaPol::kVertical));
+  for (int i = 0; i < k::NUM_ANTS; i++) AnalysisWaveform::basisChange(getWf(event,i, pueo::pol::kHorizontal), getWf(event,i,pueo::pol::kVertical));
 }
 
 
-void HybridFilter::processOne(AnalysisWaveform* g, const RawAnitaHeader* header, int ant, int pol) {}
+void pueo::HybridFilter::processOne(AnalysisWaveform* g, const RawHeader* header, int ant, int pol) {}
 
 
-void SumDifferenceFilter::process(FilteredAnitaEvent * event) {
+void pueo::SumDifferenceFilter::process(FilteredEvent * event) {
 
 #ifdef USE_OMP
 #pragma omp  parallel for 
 #endif
 
-  for (int i = 0; i < NUM_SEAVEYS; i++) AnalysisWaveform::sumDifference(getWf(event,i, AnitaPol::kHorizontal), getWf(event,i,AnitaPol::kVertical));
+  for (int i = 0; i < k::NUM_ANTS; i++) AnalysisWaveform::sumDifference(getWf(event,i, pueo::pol::kHorizontal), getWf(event,i,pueo::pol::kVertical));
 }
 
 
-void SumDifferenceFilter::processOne(AnalysisWaveform* g, const RawAnitaHeader* header, int ant, int pol) {}
+void pueo::SumDifferenceFilter::processOne(AnalysisWaveform* g, const RawHeader* header, int ant, int pol) {}
 
 
-void FlipHVFilter::process(FilteredAnitaEvent * event) {
+void pueo::FlipHVFilter::process(FilteredEvent * event) {
 
 #ifdef USE_OMP
 #pragma omp  parallel for 
 #endif
 
-  for (int i = 0; i < NUM_SEAVEYS; i++) AnalysisWaveform::flipHV(getWf(event,i, AnitaPol::kHorizontal), getWf(event,i,AnitaPol::kVertical));
+  for (int i = 0; i < k::NUM_ANTS; i++) AnalysisWaveform::flipHV(getWf(event,i, pueo::pol::kHorizontal), getWf(event,i,pueo::pol::kVertical));
 }
 
 
-void FlipHVFilter::processOne(AnalysisWaveform* g, const RawAnitaHeader* header, int ant, int pol) {}
+void pueo::FlipHVFilter::processOne(AnalysisWaveform* g, const RawHeader* header, int ant, int pol) {}
 
 
-DigitalFilterOperation::DigitalFilterOperation(const FFTtools::DigitalFilter * digi, bool correct, double fmin, double fmax)
+pueo::DigitalFilterOperation::DigitalFilterOperation(const FFTtools::DigitalFilter * digi, bool correct, double fmin, double fmax)
   : digi(digi), delay(0) 
 {
   if (correct) delay = digi->avgDelay(fmin,fmax,201); //TODO don't hardcode number of points? 
 
 }
 
-void DigitalFilterOperation::processOne(AnalysisWaveform * wf, const RawAnitaHeader * header, int ant, int pol) 
+void pueo::DigitalFilterOperation::processOne(AnalysisWaveform * wf, const RawHeader * header, int ant, int pol) 
 {
   TGraphAligned * g = wf->updateEven(); 
 
@@ -103,98 +103,30 @@ void DigitalFilterOperation::processOne(AnalysisWaveform * wf, const RawAnitaHea
 }
 
 
-ALFAButterworthFilter::ALFAButterworthFilter(double cutoff)
-{
-  // cutoff is a fraction of the Nyquist frequency.
-  // (that's where the factor of 1.3 here comes from)  
-  // So this won't work properly for interpolated or padded waveforms. (actually it should work fine for time-domain padded waveforms, just not supersampled) 
-  filt = new FFTtools::ButterworthFilter(FFTtools::LOWPASS, 4, cutoff/1.3); 
-  pb = new DigitalFilterOperation(filt,true,0.18/1.3,cutoff/1.3);
-  descStr = TString::Format("ALFA filter - Butterworth low pass at %3.0lf MHz for 5TH and 13TH (assumes f_{Nyquist} = 1300 MHz)", 1e3*cutoff);
-}
-
-void ALFAButterworthFilter::process(FilteredAnitaEvent *event)
-{
-   if (AnitaVersion::get() != 3 ) return; 
-
-   pb->processOne( getWf(event, 4, AnitaPol::kHorizontal) ); 
-   //cross talk is strong in this one 
-   pb->processOne( getWf(event, 12, AnitaPol::kHorizontal) ); 
-}
-
-void ALFAButterworthFilter::processOne(AnalysisWaveform* awf, const RawAnitaHeader* header, int ant, int pol)
-{
-	printf("processOne not implemented for this yet, sorry!\n");
-}
 
 
-ALFAButterworthFilter::~ALFAButterworthFilter()
-{
-  delete pb; 
-  delete filt;
-}
-
-ALFALanczosFilter::ALFALanczosFilter(double cutoff, int a)
-{
-  // cutoff is a fraction of the Nyquist frequency.
-  // (that's where the factor of 1.3 here comes from)  
-  filt = new FFTtools::LanczosFilter(cutoff/1.3, a); 
-  pb = new DigitalFilterOperation(filt,false); 
-  descStr = TString::Format("ALFA filter - Lanczos low pass at %3.0lf MHz for 5TH and 13TH (assumes f_{Nyquist} = 1300 MHz)", 1e3*cutoff);
-}
-
-void ALFALanczosFilter::process(FilteredAnitaEvent *event)
-{
-   if (AnitaVersion::get() != 3 ) return; 
-
-   pb->processOne( getWf(event, 4, AnitaPol::kHorizontal) ); 
-   //cross talk is strong in this one 
-   pb->processOne( getWf(event, 12, AnitaPol::kHorizontal) ); 
-}
-
-void ALFALanczosFilter::processOne(AnalysisWaveform* awf, const RawAnitaHeader* header, int ant, int pol)
-{
-	printf("processOne not implemented for this yet, sorry!\n");
-}
-
-
-ALFALanczosFilter::~ALFALanczosFilter()
-{
-  delete pb; 
-  delete filt;
-}
-
-void ALFASincFilter::processOne(AnalysisWaveform* awf, const RawAnitaHeader* header, int ant, int pol)
-{
-	printf("processOne not implemented for this yet, sorry!\n");
-}
-
-
-
-
-
-void AnitaResponse::DeconvolveFilter::process(FilteredAnitaEvent * ev) 
+void pueo::DeconvolveFilter::process(FilteredEvent * ev) 
 {
 
 #ifdef UCORRELATOR_OPENMP
 #pragma omp parallel for 
 #endif
-  for (int i = 0; i < 2*NUM_SEAVEYS; i++) 
+  for (int i = 0; i < 2*k::NUM_ANTS; i++) 
   {
-    AnitaPol::AnitaPol_t pol = AnitaPol::AnitaPol_t( i %2); 
+    pueo::pol::pol_t pol = pueo::pol::pol_t( i %2); 
     int ant = i /2; 
     rm->response(pol,ant)->deconvolveInPlace(getWf(ev,ant,pol), dm); 
   }
 }
 
-void AnitaResponse::DeconvolveFilter::processOne(AnalysisWaveform* awf, const RawAnitaHeader* header, int ant, int pol)
+void pueo::DeconvolveFilter::processOne(AnalysisWaveform* awf, const RawHeader* header, int ant, int pol)
 {
 	printf("processOne not implemented for this yet, sorry!\n");
 }
 
 
 
-DeglitchFilter::DeglitchFilter(double th, int n, RemoveAction ac,int mr) 
+pueo::DeglitchFilter::DeglitchFilter(double th, int n, RemoveAction ac,int mr) 
    :action(ac), thresh(th), neighbors(n), nremoved(0), max_remove(mr) 
 {
   descStr.Form("DeglitchFilter with thresh=%g, n_neighbors=%d, action = %s, max_remove = %d", thresh, neighbors, action == DELETE ? "DELETE" : "AVERAGE", max_remove); 
@@ -211,7 +143,7 @@ static double max_abs(int n, const double * y)
   return max; 
 }
 
-void DeglitchFilter::processOne(AnalysisWaveform * wf, const RawAnitaHeader * header, int ant, int pol) 
+void pueo::DeglitchFilter::processOne(AnalysisWaveform * wf, const RawHeader * header, int ant, int pol) 
 {
 
   TGraphAligned * g = action == DELETE ? wf->updateUneven() : wf->updateEven(); 
@@ -268,7 +200,7 @@ void DeglitchFilter::processOne(AnalysisWaveform * wf, const RawAnitaHeader * he
 }
 
 
-void IFFTDiffFilter::processOne(AnalysisWaveform* g, const RawAnitaHeader * header, int ant, int pol) {
+void pueo::IFFTDiffFilter::processOne(AnalysisWaveform* g, const RawHeader * header, int ant, int pol) {
 
   int nfreq = g -> Nfreq();
 

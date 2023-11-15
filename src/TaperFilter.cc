@@ -1,8 +1,8 @@
-#include "TaperFilter.h" 
+#include "pueo/TaperFilter.h" 
 #include "TMath.h" 
-#include "AnalysisWaveform.h" 
+#include "pueo/AnalysisWaveform.h" 
 
-void GaussianTaper::processOne(AnalysisWaveform* g, const RawAnitaHeader * header = 0, int ant = 0, int pol = 0) 
+void pueo::GaussianTaper::processOne(AnalysisWaveform* g, const RawHeader * header , int ant, int pol) 
 {
 
 

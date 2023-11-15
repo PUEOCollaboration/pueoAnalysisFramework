@@ -1,7 +1,6 @@
-#include "BandwidthMeasure.h" 
-#include "AnitaVersion.h"
-#include "AnalysisWaveform.h" 
-#include "TGraphAligned.h" 
+#include "pueo/BandwidthMeasure.h" 
+#include "pueo/AnalysisWaveform.h" 
+#include "pueo/TGraphAligned.h" 
 #include "FFTtools.h"
 #include "TFile.h"
 #include <fstream> 
@@ -10,15 +9,15 @@
 #include <string>
 #include <cstdlib> 
 
-double bandwidth::bandwidthMeasure(const AnalysisWaveform* wf, int timeCheck, TGraph* gTest) 
+double pueo::bandwidth::bandwidthMeasure(const AnalysisWaveform* wf, int timeCheck, TGraph* gTest) 
 {
-  const TGraphAligned* gPow = wf->power();
+  const pueo::TGraphAligned* gPow = wf->power();
   std::vector<double> powers;
   double notch0, notch1, notch2;
   notch0=0; notch1=0; notch2=0;
-  bandwidth::checkNotches(timeCheck, notch0, notch1, notch2);
+  pueo::bandwidth::checkNotches(timeCheck, notch0, notch1, notch2);
 
-  double norm = bandwidth::fillPowers(gPow, powers, notch0, notch1, notch2);
+  double norm = pueo::bandwidth::fillPowers(gPow, powers, notch0, notch1, notch2);
   int N = powers.size();
   std::sort(powers.begin(), powers.end());
 
@@ -42,13 +41,13 @@ double bandwidth::bandwidthMeasure(const AnalysisWaveform* wf, int timeCheck, TG
   return cdf;
 }
 
-double bandwidth::differenceFromImpulse(const AnalysisWaveform* wf, int timeCheck, TGraph* gTest) 
+double pueo::bandwidth::differenceFromImpulse(const AnalysisWaveform* wf, int timeCheck, TGraph* gTest) 
 {
   const TGraphAligned* gPow = wf->power();
-  //TGraph* gImpRe = bandwidth::loadImpulsePower(timeCheck);
-  TGraph* gImp = bandwidth::loadImpulsePower(timeCheck);
-  TGraph* gImpRe = bandwidth::downsampleImpulse(gImp, gPow);
-  bandwidth::normalizePower(gImpRe);
+  //TGraph* gImpRe = pueo::bandwidth::loadImpulsePower(timeCheck);
+  TGraph* gImp = pueo::bandwidth::loadImpulsePower(timeCheck);
+  TGraph* gImpRe = pueo::bandwidth::downsampleImpulse(gImp, gPow);
+  pueo::bandwidth::normalizePower(gImpRe);
   double retVal = 0;
   double norm = 0;
   for(int i = 0; i < gPow->GetN(); i++)
@@ -70,13 +69,13 @@ double bandwidth::differenceFromImpulse(const AnalysisWaveform* wf, int timeChec
   return retVal;
 }
 
-double bandwidth::maxDifferenceFromImpulse(const AnalysisWaveform* wf, int timeCheck, TGraph* gTest) 
+double pueo::bandwidth::maxDifferenceFromImpulse(const AnalysisWaveform* wf, int timeCheck, TGraph* gTest) 
 {
   const TGraphAligned* gPow = wf->power();
-  //TGraph* gImpRe = bandwidth::loadImpulsePower(timeCheck);
-  TGraph* gImp = bandwidth::loadImpulsePower(timeCheck);
-  TGraph* gImpRe = bandwidth::downsampleImpulse(gImp, gPow);
-  bandwidth::normalizePower(gImpRe);
+  //TGraph* gImpRe = pueo::bandwidth::loadImpulsePower(timeCheck);
+  TGraph* gImp = pueo::bandwidth::loadImpulsePower(timeCheck);
+  TGraph* gImpRe = pueo::bandwidth::downsampleImpulse(gImp, gPow);
+  pueo::bandwidth::normalizePower(gImpRe);
   double retVal = 0;
   double norm = 0;
   for(int i = 0; i < gPow->GetN(); i++)
@@ -98,14 +97,14 @@ double bandwidth::maxDifferenceFromImpulse(const AnalysisWaveform* wf, int timeC
   return maxDiff;
 }
 
-double bandwidth::hooverIndex(const AnalysisWaveform * wf, int timeCheck) 
+double pueo::bandwidth::hooverIndex(const AnalysisWaveform * wf, int timeCheck) 
 {
   const TGraphAligned* gPow = wf->power();
   std::vector<double> powers;
   double notch0, notch1, notch2;
-  bandwidth::checkNotches(timeCheck, notch0, notch1, notch2);
+  pueo::bandwidth::checkNotches(timeCheck, notch0, notch1, notch2);
 
-  double norm = bandwidth::fillPowers(gPow, powers, notch0, notch1, notch2);
+  double norm = pueo::bandwidth::fillPowers(gPow, powers, notch0, notch1, notch2);
   int N = powers.size();
   double meanVal = norm/double(N);
 
@@ -116,14 +115,14 @@ double bandwidth::hooverIndex(const AnalysisWaveform * wf, int timeCheck)
   return hoover;
 }
 
-double bandwidth::theilIndex(const AnalysisWaveform * wf, int timeCheck) 
+double pueo::bandwidth::theilIndex(const AnalysisWaveform * wf, int timeCheck) 
 {
   const TGraphAligned* gPow = wf->power();
   std::vector<double> powers;
   double notch0, notch1, notch2;
-  bandwidth::checkNotches(timeCheck, notch0, notch1, notch2);
+  pueo::bandwidth::checkNotches(timeCheck, notch0, notch1, notch2);
 
-  double norm = bandwidth::fillPowers(gPow, powers, notch0, notch1, notch2);
+  double norm = pueo::bandwidth::fillPowers(gPow, powers, notch0, notch1, notch2);
   int N = powers.size();
   double meanVal = norm/double(N);
 
@@ -136,7 +135,7 @@ double bandwidth::theilIndex(const AnalysisWaveform * wf, int timeCheck)
   return theil;
 }
 
-double bandwidth::powerInBand(const AnalysisWaveform* wf, double minFreq, double maxFreq) 
+double pueo::bandwidth::powerInBand(const AnalysisWaveform* wf, double minFreq, double maxFreq) 
 {
   const TGraphAligned* gPow = wf->power();
 
@@ -153,72 +152,20 @@ double bandwidth::powerInBand(const AnalysisWaveform* wf, double minFreq, double
   return fraction;
 }
 
-void bandwidth::checkNotches(int timeCheck, double& notch0, double& notch1, double& notch2)
+
+
+TGraph* pueo::bandwidth::loadImpulsePower(int timeCheck)
 {
-  if(AnitaVersion::get() != 4) return;
+  //FIXME PUEO 
   TString dir;
-  dir.Form("%s/share/AnitaAnalysisFramework/responses/TUFFs/index.txt", getenv("ANITA_UTIL_INSTALL_DIR"));
-  std::ifstream inf(dir.Data());
-  std::string notchConfig;
-  std::string tempConfig;
-  long notchTime;
-  while(inf >> tempConfig >> notchTime)
-  {
-    if(timeCheck < notchTime)
-    {
-      notchConfig = tempConfig;
-      break;
-    }
-  }
-  std::istringstream s(notchConfig);
-  std::getline(s, tempConfig, '_');
-  std::getline(s, tempConfig, '_');
-  notch0 = atoi(tempConfig.c_str());
-  notch0 /= 1000.;
-  std::getline(s, tempConfig, '_');
-  notch1 = atoi(tempConfig.c_str());
-  notch1 /= 1000.;
-  std::getline(s, tempConfig, '_');
-  notch2 = atoi(tempConfig.c_str());
-  notch2 /= 1000.;
-  inf.close();
+  dir.Form("%s/share/AnitaAnalysisFramework/responses/SingleBRotter/all.imp", getenv("ANITA_UTIL_INSTALL_DIR"));
+  TGraph* g = new TGraph(dir.Data());
+  TGraph* gpow = FFTtools::makePowerSpectrum(g);
+  delete g;
+  return gpow;
 }
 
-TGraph* bandwidth::loadImpulsePower(int timeCheck)
-{
-  TString dir;
-  if(AnitaVersion::get() != 4)
-  {
-    dir.Form("%s/share/AnitaAnalysisFramework/responses/SingleBRotter/all.imp", getenv("ANITA_UTIL_INSTALL_DIR"));
-    TGraph* g = new TGraph(dir.Data());
-    TGraph* gpow = FFTtools::makePowerSpectrum(g);
-    delete g;
-    return gpow;
-  }
-  else
-  {
-    dir.Form("%s/share/AnitaAnalysisFramework/responses/TUFFs/index.txt", getenv("ANITA_UTIL_INSTALL_DIR"));
-    std::ifstream inf(dir.Data());
-    std::string notchConfig;
-    std::string tempConfig;
-    long notchTime;
-    while(inf >> tempConfig >> notchTime)
-    {
-      if(timeCheck < notchTime)
-      {
-        notchConfig = tempConfig;
-        break;
-      }
-    }
-    dir.Form("%s/share/AnitaAnalysisFramework/responses/TUFFs/averages/%s.root", getenv("ANITA_UTIL_INSTALL_DIR"), notchConfig.c_str());
-    TFile f(dir.Data());
-    TGraph* gpow =(TGraph*) f.Get("power");
-    f.Close();
-    return gpow;
-  }
-}
-
-TGraph* bandwidth::downsampleImpulse(TGraph* imp, const TGraphAligned* examp)
+TGraph* pueo::bandwidth::downsampleImpulse(TGraph* imp, const TGraphAligned* examp)
 {
   TGraph* theReturn = new TGraph(examp->GetN());
   for(int i = 0; i < examp->GetN(); i++)
@@ -228,7 +175,7 @@ TGraph* bandwidth::downsampleImpulse(TGraph* imp, const TGraphAligned* examp)
   return theReturn;
 }
 
-void bandwidth::normalizePower(TGraph* g)
+void pueo::bandwidth::normalizePower(TGraph* g)
 {
   double norm = 0;
   for(int i = 0; i < g->GetN(); i++)
@@ -240,7 +187,7 @@ void bandwidth::normalizePower(TGraph* g)
   return;
 }
 
-double bandwidth::fillPowers(const TGraphAligned* powdb, std::vector<double> &powers, double notch0, double notch1, double notch2)
+double pueo::bandwidth::fillPowers(const TGraphAligned* powdb, std::vector<double> &powers, double notch0, double notch1, double notch2)
 {
   double norm = 0;
   int skip = 0;
@@ -248,21 +195,6 @@ double bandwidth::fillPowers(const TGraphAligned* powdb, std::vector<double> &po
   {
     skip = 0;
     if(powdb->GetX()[i] < .18 || powdb->GetX()[i] > 1.1) skip = 1;
-    if(AnitaVersion::get() == 4)
-    {
-      if(notch0 > 0)
-      {
-        if(notch0 - .15 <= powdb->GetX()[i] <= notch0 + .15) skip = 1;
-      }
-      if(notch1 > 0)
-      {
-        if(notch1 - .15 <= powdb->GetX()[i] <= notch1 + .15) skip = 1;
-      }
-      if(notch2 > 0)
-      {
-        if(notch2 - .15 <= powdb->GetX()[i] <= notch2 + .15) skip = 1;
-      }
-    }
     if(!skip)
     {
       powers.push_back(powdb->GetY()[i]);
@@ -274,7 +206,7 @@ double bandwidth::fillPowers(const TGraphAligned* powdb, std::vector<double> &po
 }
 
 
-double bandwidth::lowness(const AnalysisWaveform * wf, double min, double max) 
+double pueo::bandwidth::lowness(const AnalysisWaveform * wf, double min, double max) 
 {
 
   double sum = 0; 
