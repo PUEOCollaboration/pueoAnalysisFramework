@@ -394,11 +394,11 @@ void pueo::FilteredEvent::plotSummary(TCanvas * ch, TCanvas * cv) const
   }
 
 }
-int pueo::FilteredEvent::checkSaturation(ULong64_t * save_hsat, ULong64_t * save_vsat, double thresh) const
+int pueo::FilteredEvent::checkSaturation(std::bitset<k::NUM_HORNS> * save_hsat, std::bitset<k::NUM_HORNS> * save_vsat, double thresh) const
 {
   
-  ULong64_t hsat = 0; 
-  ULong64_t vsat = 0; 
+  std::bitset<k::NUM_HORNS> hsat = 0; 
+  std::bitset<k::NUM_HORNS> vsat = 0; 
 
   int totalsat = 0; 
   for (int i = 0; i < k::NUM_ANTS; i++) 
@@ -412,7 +412,7 @@ int pueo::FilteredEvent::checkSaturation(ULong64_t * save_hsat, ULong64_t * save
       {
         if (fabs(yh[j]) > thresh)
         {
-          hsat |= 1ul << i; 
+          hsat.set(i); 
           totalsat ++; 
           break; 
         }
@@ -422,7 +422,7 @@ int pueo::FilteredEvent::checkSaturation(ULong64_t * save_hsat, ULong64_t * save
       {
         if (fabs(yv[j]) > thresh)
         {
-          vsat |= 1ul << i; 
+          vsat.set(i); 
           totalsat ++; 
           break; 
         }
