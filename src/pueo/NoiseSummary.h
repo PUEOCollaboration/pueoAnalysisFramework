@@ -38,7 +38,7 @@ class NoiseSummary
   bool rmsFifoFillFlag; //has the fifo filled up yet?
 
   //data
-  double avgRMSNoise[k::NUM_PHI][ring::kNotARing][k::NUM_POLS]; //averaged rms of min bias waveforms
+  double avgRMSNoise[k::NUM_HORNS][k::NUM_POLS]; //averaged rms of min bias waveforms
   TH2D *avgMapProf[k::NUM_POLS]; //Averaged histograms over fifoLength minBias samples
 
 

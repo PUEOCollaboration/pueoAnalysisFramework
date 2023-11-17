@@ -1,4 +1,4 @@
-#include "AnitaNoiseSummary.h"
+#include "pueo/NoiseSummary.h"
 
 
 
@@ -8,25 +8,25 @@
  *
  * Default constructor for ROOT
  */
-AnitaNoiseSummary::AnitaNoiseSummary() {
-  for (int poli=0; poli<NUM_POLS; poli++) {
+pueo::NoiseSummary::NoiseSummary() {
+  for (int poli=0; poli<k::NUM_POLS; poli++) {
     avgMapProf[poli] = NULL;
   }
   zeroInternals();
 }
 
-AnitaNoiseSummary::~AnitaNoiseSummary() {
+pueo::NoiseSummary::~NoiseSummary() {
 
   deleteHists();
 }
 
-void AnitaNoiseSummary::zeroInternals() {
+void pueo::NoiseSummary::zeroInternals() {
 
   fifoLength=0;
 
-  memset(avgRMSNoise,0,NUM_PHI*NUM_ANTENNA_RINGS*NUM_POLS*sizeof(double));
+  memset(avgRMSNoise,0,k::NUM_HORNS*k::NUM_POLS*sizeof(double));
 
-  for (int poli=0; poli<NUM_POLS; poli++) {
+  for (int poli=0; poli<k::NUM_POLS; poli++) {
     if (avgMapProf[poli] != NULL) {
       delete avgMapProf[poli];
       avgMapProf[poli] = NULL;
@@ -37,9 +37,9 @@ void AnitaNoiseSummary::zeroInternals() {
 }
 
 
-void AnitaNoiseSummary::deleteHists() {
+void pueo::NoiseSummary::deleteHists() {
   
-  for (int poli=0; poli<NUM_POLS; poli++) {
+  for (int poli=0; poli<k::NUM_POLS; poli++) {
     if (avgMapProf[poli] != NULL) {
       delete avgMapProf[poli];
       avgMapProf[poli] = NULL;
