@@ -21,12 +21,12 @@
 #pragma link C++ class pueo::AnalysisWaveform::PowerCalculationOptions;
 #pragma link C++ class pueo::PrettyAnalysisWaveform+;
 #pragma link C++ class pueo::TGraphAligned+;
-//#pragma link C++ class CorrelationSummaryAnita4+;
 
 #pragma link C++ class pueo::TemplateSummary+;
 #pragma link C++ class pueo::TemplateSummary::SingleTemplateResult+;
 #pragma link C++ class pueo::TemplateMachine+;
 
+#pragma link C++ class pueo::CorrelationSummary+;
 #pragma link C++ class pueo::NoiseSummary+;
 #pragma link C++ class pueo::NoiseMonitor+;
 

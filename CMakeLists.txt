@@ -1,5 +1,5 @@
 
-# CMakeLists.txt for AnitaAnalysisFramework
+# CMakeLists.txt for pueoAnalysisFramework
 cmake_minimum_required(VERSION 3.0.0)
 project(pueoAnalysisFramework)
 
