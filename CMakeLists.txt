@@ -93,7 +93,7 @@ ROOT_GENERATE_DICTIONARY(${DICTNAME} ${HEADER_FILES} LINKDEF LinkDef.h)
 
 #---Create a shared library with generated dictionary
 add_library(${libname} SHARED ${SOURCE_FILES} ${DICTNAME}.cxx)
-target_link_libraries(${libname} ${ZLIB_LIBRARIES} RootFftwWrapper AnitaEvent AnitaCorrelator ${ROOT_LIBRARIES} ${FFTW_LIBRARIES})
+target_link_libraries(${libname} ${ZLIB_LIBRARIES} RootFftwWrapper pueoEvent AntarcticaRoot ${ROOT_LIBRARIES} ${FFTW_LIBRARIES})
 
 add_custom_target(${DICTNAME}.pcm DEPENDS ${DICTNAME})
 
