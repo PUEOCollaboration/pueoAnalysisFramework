@@ -393,6 +393,9 @@ namespace pueo
 
     double getExpectedGeoMagPolarisation(double phiWave, double thetaWave, double xMax) const;
     double getExpectedGeoMagPolarisationUpgoing(double phiWave, double thetaWave, double pathLength) const;
+
+    AntarcticCoord asAntarcticCoord() const { return AntarcticCoord(AntarcticCoord::WGS84, latitude, longitude, altitude); } 
+    PayloadParameters::PayloadAttitude asPayloadAttitude() const { return PayloadParameters::PayloadAttitude(heading,pitch,roll); }
     
    private:
     Int_t		fIncludeGroupDelay;		/// Include group delay in deltaTs? (default is no)
@@ -421,8 +424,6 @@ namespace pueo
     Double_t getDeltaTExpectedSeaveyOpt(Int_t ant1, Int_t ant2,Double_t sourceLon, Double_t sourceLat, Double_t sourceAlt, Double_t *deltaR, Double_t *deltaZ, Double_t *deltaPhi);
     Double_t getGroupDelay(Double_t phiToAntBoresight);  
     
-    AntarcticCoord asAntarcticCoord() const { return AntarcticCoord(AntarcticCoord::WGS84, latitude, longitude, altitude); } 
-    PayloadParameters::PayloadAttitude asPayloadAttitude() const { return PayloadParameters::PayloadAttitude(heading,pitch,roll); }
 
     /** 
      * Rotate the coordinate system so that theta/phi account for payload pitch and roll
