@@ -1,14 +1,14 @@
-#include "ResponseManager.h" 
-#include "SystemResponse.h" 
+#include "pueo/ResponseManager.h" 
+#include "pueo/SystemResponse.h" 
 #include <stdio.h>
 #include <fstream>
-#include "AnalysisWaveform.h" 
+#include "pueo/AnalysisWaveform.h" 
 #include <sys/types.h>
 #include <dirent.h>
 #include <assert.h>
 #include "FFTtools.h"
 #include "TGraph.h"
-#include "AnitaGeomTool.h"
+#include "pueo/GeomTool.h"
 
 
 /** See README.response */ 
@@ -16,7 +16,7 @@
 
 
 
-int AnitaResponse::ResponseManager::loadResponsesFromDir(const char * raw_dir, int npad, unsigned int evTime)
+int pueo::ResponseManager::loadResponsesFromDir(const char * raw_dir, int npad, unsigned int evTime)
 {
   DIR *dp; 
   struct dirent *ep; 
@@ -88,7 +88,7 @@ int AnitaResponse::ResponseManager::loadResponsesFromDir(const char * raw_dir, i
 
   if (!dp)
   {
-    dir.Form("%s/share/AnitaAnalysisFramework/responses/%s", getenv("ANITA_UTIL_INSTALL_DIR"), raw_dir);
+    dir.Form("%s/share/pueoAnalysisFramework/responses/%s", getenv("PUEO_UTIL_INSTALL_DIR"), raw_dir);
     dp = opendir(dir.Data());
     if(dp)
     {
@@ -159,7 +159,7 @@ int AnitaResponse::ResponseManager::loadResponsesFromDir(const char * raw_dir, i
       *prefix = 0;  //chop it off from the prefix
     }
 
-    AnitaResponse::AbstractResponse * r; 
+    Response::AbstractResponse * r; 
 
     // do we have something with the same prefix but different angle? If so, we should add to it 
     if (prefix_map.count(prefix))
@@ -188,7 +188,7 @@ int AnitaResponse::ResponseManager::loadResponsesFromDir(const char * raw_dir, i
         assert(imp.GetN()); 
         AnalysisWaveform aw (imp.GetN(), imp.GetY(), imp.GetX()[1] - imp.GetX()[0], imp.GetX()[0]); 
         aw.padEven(npad); 
-        ((AnitaResponse::Response*) r)->addResponseAtAngle(angle, aw.freq()); 
+        ((Response*) r)->addResponseAtAngle(angle, aw.freq()); 
       }
     }
 
@@ -216,19 +216,19 @@ int AnitaResponse::ResponseManager::loadResponsesFromDir(const char * raw_dir, i
     if (!strcasecmp(prefix,"all"))
     {
       start_pol = 0; start_ant = 0; 
-      stop_pol = 1; stop_ant = NUM_SEAVEYS-1; 
+      stop_pol = 1; stop_ant = k::NUM_ANTS-1; 
     }
 
     else if (!strcasecmp(prefix,"allHpol"))
     {
       start_pol = 0; start_ant = 0; 
-      stop_pol = 0; stop_ant = NUM_SEAVEYS-1; 
+      stop_pol = 0; stop_ant = k::NUM_ANTS-1; 
     }
 
     else if (!strcasecmp(prefix,"allVpol"))
     {
       start_pol = 1; start_ant = 0; 
-      stop_pol = 1; stop_ant = NUM_SEAVEYS-1; 
+      stop_pol = 1; stop_ant = k::NUM_ANTS-1; 
     }
     else
     {
@@ -255,20 +255,36 @@ int AnitaResponse::ResponseManager::loadResponsesFromDir(const char * raw_dir, i
         continue; 
       }
 
-      AnitaRing::AnitaRing_t the_ring; 
+      ring::ring_t the_ring; 
 
       if (ring == 'T' || ring == 't')
       {
-        the_ring = AnitaRing::kTopRing; 
+        the_ring = ring::kTopRing; 
       }
-      else  if (ring == 'M' || ring == 'm')
+      else  if (ring == 'U' || ring == 'u')
       {
-        the_ring = AnitaRing::kMiddleRing; 
+        the_ring = ring::kUpperMiddleRing; 
       }
+      else  if (ring == 'D' || ring == 'D')
+      {
+        the_ring = ring::kLowerMiddleRing; 
+      }
+ 
       else if (ring == 'B' || ring == 'b')
       {
-        the_ring = AnitaRing::kBottomRing; 
+        the_ring = ring::kBottomRing; 
       }
+      else if (ring == 'N' || ring == 'n')
+      {
+        the_ring = ring::kNadirRing; 
+      }
+      else if (ring == 'f' || ring == 'F')
+      {
+        the_ring = ring::kLF; 
+      }
+
+
+
 
       else
       {
@@ -277,7 +293,7 @@ int AnitaResponse::ResponseManager::loadResponsesFromDir(const char * raw_dir, i
         continue; 
       }
 
-      int ant = AnitaGeomTool::Instance()->getAntFromPhiRing(phi-1, the_ring); 
+      int ant = GeomTool::Instance().getAntFromPhiRing(phi-1, the_ring); 
       start_ant = ant; 
       stop_ant = ant; 
     }
@@ -295,7 +311,7 @@ int AnitaResponse::ResponseManager::loadResponsesFromDir(const char * raw_dir, i
     free(prefix); 
   }
 
-  for (int ant = 0; ant < NUM_SEAVEYS; ant++)
+  for (int ant = 0; ant < k::NUM_ANTS; ant++)
   {
     for (int pol = 0; pol <2; pol++) 
     {
@@ -328,7 +344,7 @@ int AnitaResponse::ResponseManager::loadResponsesFromDir(const char * raw_dir, i
 // }
 
 
-const std::string getConfigurationFromIndex(const char * indexFile, unsigned int evTime) 
+static const std::string getConfigurationFromIndex(const char * indexFile, unsigned int evTime) 
 {
     std::ifstream inf(indexFile);
     std::string tempStr; 
@@ -346,7 +362,7 @@ const std::string getConfigurationFromIndex(const char * indexFile, unsigned int
 }
 
 
-void AnitaResponse::ResponseManager::checkTime(unsigned int evTime)
+void pueo::ResponseManager::checkTime(unsigned int evTime)
 {
   if(!hasIndex) return;
   DIR *dp; 
@@ -414,7 +430,7 @@ void AnitaResponse::ResponseManager::checkTime(unsigned int evTime)
     }
     if (!dp)
     {
-      dir.Form("%s/share/AnitaAnalysisFramework/responses/%s", getenv("ANITA_UTIL_INSTALL_DIR"), whichDir); 
+      dir.Form("%s/share/pueoAnalysisFramework/responses/%s", getenv("PUEO_UTIL_INSTALL_DIR"), whichDir); 
       dp = opendir(dir.Data()); 
       if(dp)
       {
@@ -457,18 +473,18 @@ void AnitaResponse::ResponseManager::checkTime(unsigned int evTime)
 
 
 
-AnitaResponse::ResponseManager::ResponseManager(const char * dir, int npad, const AnitaResponse::DeconvolutionMethod* methodPtr, unsigned int evTime)
+pueo::ResponseManager::ResponseManager(const char * dir, int npad, const DeconvolutionMethod* methodPtr, unsigned int evTime)
 {
   memset(responses,0,sizeof(responses)); 
   loadResponsesFromDir(dir,npad, evTime);
-  method = methodPtr == NULL ? &AnitaResponse::kDefaultDeconvolution : methodPtr;
+  method = methodPtr == NULL ? &pueo::kDefaultDeconvolution : methodPtr;
   lastTime = evTime;
   whichDir = dir;
   savePad = npad;
   // method = &kDefaultDeconvolution;
 }
 
-AnitaResponse::ResponseManager::~ResponseManager() 
+pueo::ResponseManager::~ResponseManager() 
 {
 
   for (size_t i = 0; i < response_store.size(); i++) 

@@ -88,7 +88,7 @@ class FilteredEvent
 
    void plotSummary(TCanvas * chpol = 0, TCanvas * cvpol = 0) const;
 
-   int checkSaturation(std::bitset<k::NUM_HORNS> *save_hsat  =0, std::bitset<k::NUM_HORNS>* save_vsat = 0, double threshold=1500) const; 
+   int checkSaturation(std::bitset<k::NUM_ANTS> *save_hsat  =0, std::bitset<k::NUM_ANTS>* save_vsat = 0, double threshold=1500) const; 
    
 	 int checkStepFunction(Int_t lab = 1, ring::ring_t ring = ring::kTopRing, Int_t phiSector = 8, pol::pol_t pol = pol::kVertical) const; 
 	 int checkSurfForGlitch(Int_t surf = 0, Int_t lab = -1, double glitchThreshold=800) const; 

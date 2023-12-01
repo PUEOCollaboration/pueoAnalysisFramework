@@ -50,7 +50,7 @@ void pueo::ConditionalFilterOperation::process(FilteredEvent * ev)
 #ifdef USE_OMP
 #pragma omp parallel for
 #endif
-    for (int ant = 0; ant <k::NUM_HORNS; ant++) 
+    for (int ant = 0; ant <k::NUM_ANTS; ant++) 
     {
       if (fn(ev,ant, (pol::pol_t)pol))
       {
@@ -70,7 +70,7 @@ void pueo::UniformFilterOperation::process(FilteredEvent * ev)
 #ifdef USE_OMP
 #pragma omp parallel for
 #endif
-  for (size_t i = 0; i < k::NUM_HORNS * 2; i++) 
+  for (size_t i = 0; i < k::NUM_ANTS * 2; i++) 
   {
     processOne(getWf(ev,i)); 
   }

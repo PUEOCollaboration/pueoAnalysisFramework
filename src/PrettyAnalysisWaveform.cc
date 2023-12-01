@@ -5,33 +5,36 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "PrettyAnalysisWaveform.h"
+//FIXME this is not going to work yet until antenna numbers are revised... 
 
-ClassImp(PrettyAnalysisWaveform);
+#include "pueo/PrettyAnalysisWaveform.h"
+
+ClassImp(pueo::PrettyAnalysisWaveform);
 
 
 
 //My incredibly dodgy approach to fitting with MINUIT that I'm going to call from within itself
 // this is horrible and dangerous and should never bve done, but hey ho there we go.
-void CorSumFCNanita4(Int_t& npar, Double_t*gin,
+static void CorSumFCNanita4(Int_t& npar, Double_t*gin,
                        Double_t&f, Double_t* par, Int_t flag)
 {
    //par[0] is phiWave
    //par[1] is thetaWave
    //par[2] is numAnts (11 or 19)
 
-  CorrelationSummaryAnita4* myDodgyCorSumPtr = dynamic_cast<CorrelationSummaryAnita4*>(gMinuit->GetObjectFit());
+  pueo::CorrelationSummary* myDodgyCorSumPtr = dynamic_cast<pueo::CorrelationSummary*>(gMinuit->GetObjectFit());
   f=myDodgyCorSumPtr->getChiSquared(par[0],par[1],11);
   //  std::cout << par[0] << "\t" << par[1] << "\t" << f << std::endl;
 }
 
-PrettyAnalysisWaveform::PrettyAnalysisWaveform(UsefulAnitaEvent* uae, FilterStrategy* strategy, Adu5Pat* pat, RawAnitaHeader* header):FilteredAnitaEvent(uae, strategy, pat, header) {
+pueo::PrettyAnalysisWaveform::PrettyAnalysisWaveform(UsefulEvent* uae, FilterStrategy* strategy, nav::Attitude* pat, RawHeader* header)
+  :FilteredEvent(uae, strategy, pat, header) {
 fPassBandFilter=0;
 fNotchFilter=0;
 fPat = pat;
 }
 
-AnalysisWaveform* PrettyAnalysisWaveform::getCorrelation(int chanIndex1, int chanIndex2) 
+pueo::AnalysisWaveform* pueo::PrettyAnalysisWaveform::getCorrelation(int chanIndex1, int chanIndex2) 
 {
    AnalysisWaveform* wf1 = (AnalysisWaveform*) getFilteredGraph(chanIndex1);
    AnalysisWaveform* wf2 = (AnalysisWaveform*) getFilteredGraph(chanIndex2);
@@ -58,12 +61,12 @@ AnalysisWaveform* PrettyAnalysisWaveform::getCorrelation(int chanIndex1, int cha
 	 return wfCorr;     
 }
 
-AnalysisWaveform *PrettyAnalysisWaveform::getCorrelationInterpolated(int chanIndex1, int chanIndex2, AnitaPol::AnitaPol_t pol,  Int_t npadfreq) 
+pueo::AnalysisWaveform *pueo::PrettyAnalysisWaveform::getCorrelationInterpolated(int chanIndex1, int chanIndex2, pol::pol_t pol,  Int_t npadfreq) 
 {
-  if(chanIndex1 <0 || chanIndex1>(NUM_DIGITZED_CHANNELS-1))
+  if(chanIndex1 <0 || chanIndex1>(k::NUM_DIGITZED_CHANNELS-1))
     std::cerr << "Invalid channel index:\t" << chanIndex1 << "\n";
 
-  if(chanIndex2 <0 || chanIndex2>(NUM_DIGITZED_CHANNELS-1))
+  if(chanIndex2 <0 || chanIndex2>(k::NUM_DIGITZED_CHANNELS-1))
     std::cerr << "Invalid channel index:\t" << chanIndex2 << "\n";
 		
 	 const AnalysisWaveform* wf1 = getFilteredGraph(chanIndex1, pol);
@@ -102,25 +105,26 @@ AnalysisWaveform *PrettyAnalysisWaveform::getCorrelationInterpolated(int chanInd
 }
 
 
-void PrettyAnalysisWaveform::fillSixAntArrays(int ant, int topAnts[3], int bottomAnts[3])
+void pueo::PrettyAnalysisWaveform::fillSixAntArrays(int ant, int topAnts[3], int bottomAnts[3])
 {
    //   std::cerr << "fillSixAntArrays( " << ant << ")\n";
   int top=-1,bottom=-1;
   int leftTop=-1, rightTop=-1;
   int leftBottom=-1, rightBottom=-1;
 
+  std::cerr <<" FIXME: Not updated for PUEO yet" << std::endl;
   if(ant<16) {
     top=ant;
-    bottom=AnitaGeomTool::getAzimuthPartner(top);
+//FIXME    bottom=GeomTool::getAzimuthPartner(top);
   }
   else {
     bottom=ant;
-    top=AnitaGeomTool::getAzimuthPartner(bottom);
+//FIXME    top=GeomTool::getAzimuthPartner(bottom);
   } 
 
   //  std::cout << top << "\t" << bottom << std::endl;
-  AnitaGeomTool::getThetaPartners(top,leftTop,rightTop);
-  AnitaGeomTool::getThetaPartners(bottom,leftBottom,rightBottom);
+//FIXME  GeomTool::getThetaPartners(top,leftTop,rightTop);
+//FIXME  GeomTool::getThetaPartners(bottom,leftBottom,rightBottom);
   topAnts[0]=leftTop;
   topAnts[1]=top;
   topAnts[2]=rightTop;
@@ -131,8 +135,9 @@ void PrettyAnalysisWaveform::fillSixAntArrays(int ant, int topAnts[3], int botto
 }
 
 
-void PrettyAnalysisWaveform::fillNineAntArrays(int ant, int nineAnts[9])
+void pueo::PrettyAnalysisWaveform::fillNineAntArrays(int ant, int nineAnts[9])
 {
+  std::cerr <<" FIXME: Not updated for PUEO yet" << std::endl;
   // Top 0-2
   // Middle 3-5
   // Bottom 6-8
@@ -145,22 +150,22 @@ void PrettyAnalysisWaveform::fillNineAntArrays(int ant, int nineAnts[9])
 
   if(ant<16) {
     top=ant;
-    middle=AnitaGeomTool::getAzimuthPartner(top);
+//FIXME    middle=AnitaGeomTool::getAzimuthPartner(top);
     bottom=middle+16;
   } else if (ant<32){
     middle = ant;
-    top = AnitaGeomTool::getAzimuthPartner(middle);
+//FIXME    top = AnitaGeomTool::getAzimuthPartner(middle);
     bottom=middle+16;
   } else {
     bottom=ant;
-    middle=AnitaGeomTool::getAzimuthPartner(bottom);
-    top=AnitaGeomTool::getAzimuthPartner(middle);
+//FIXME    middle=AnitaGeomTool::getAzimuthPartner(bottom);
+//FIXME    top=AnitaGeomTool::getAzimuthPartner(middle);
   } 
 
 //   std::cout << top << "\t" << bottom << std::endl;
-  AnitaGeomTool::getThetaPartners(top,leftTop,rightTop);
-  AnitaGeomTool::getThetaPartners(middle,leftMiddle,rightMiddle);
-  AnitaGeomTool::getThetaPartners(bottom,leftBottom,rightBottom);
+//FIXME  AnitaGeomTool::getThetaPartners(top,leftTop,rightTop);
+//FIXME  AnitaGeomTool::getThetaPartners(middle,leftMiddle,rightMiddle);
+//FIXME  AnitaGeomTool::getThetaPartners(bottom,leftBottom,rightBottom);
 
   nineAnts[0] = leftTop;
   nineAnts[1] = top;
@@ -175,9 +180,10 @@ void PrettyAnalysisWaveform::fillNineAntArrays(int ant, int nineAnts[9])
 }
 
 
-void PrettyAnalysisWaveform::fillNextFourAntArrays(int ant, int nextFourAnts[4])
+void pueo::PrettyAnalysisWaveform::fillNextFourAntArrays(int ant, int nextFourAnts[4])
 {
 
+  std::cerr <<" FIXME: Not updated for PUEO yet" << std::endl;
   int top=-1,bottom=-1;
   int leftTop=-1, rightTop=-1;
   int leftLeftTop=-1, rightRightTop=-1;
@@ -186,20 +192,20 @@ void PrettyAnalysisWaveform::fillNextFourAntArrays(int ant, int nextFourAnts[4])
 
   if(ant<16) {
     top=ant;
-    bottom=AnitaGeomTool::getAzimuthPartner(top);
+//FIXME    bottom=AnitaGeomTool::getAzimuthPartner(top);
   }
   else {
     bottom=ant;
-    top=AnitaGeomTool::getAzimuthPartner(bottom);
+//FIXME    top=AnitaGeomTool::getAzimuthPartner(bottom);
   }
   int crap;
   //  std::cout << top << "\t" << bottom << std::endl;
-  AnitaGeomTool::getThetaPartners(top,leftTop,rightTop);
-  AnitaGeomTool::getThetaPartners(bottom,leftBottom,rightBottom);
-  AnitaGeomTool::getThetaPartners(leftTop,leftLeftTop,crap);
-  AnitaGeomTool::getThetaPartners(rightTop,crap,rightRightTop);
-  AnitaGeomTool::getThetaPartners(leftBottom,leftLeftBottom,crap);
-  AnitaGeomTool::getThetaPartners(rightBottom,crap,rightRightBottom);
+//FIXME  AnitaGeomTool::getThetaPartners(top,leftTop,rightTop);
+//FIXME  AnitaGeomTool::getThetaPartners(bottom,leftBottom,rightBottom);
+//FIXME  AnitaGeomTool::getThetaPartners(leftTop,leftLeftTop,crap);
+//FIXME  AnitaGeomTool::getThetaPartners(rightTop,crap,rightRightTop);
+//FIXME  AnitaGeomTool::getThetaPartners(leftBottom,leftLeftBottom,crap);
+//FIXME  AnitaGeomTool::getThetaPartners(rightBottom,crap,rightRightBottom);
   nextFourAnts[0]=leftLeftTop;
   nextFourAnts[1]=rightRightTop;
   nextFourAnts[2]=leftLeftBottom;
@@ -207,9 +213,10 @@ void PrettyAnalysisWaveform::fillNextFourAntArrays(int ant, int nextFourAnts[4])
 
 }
 
-void PrettyAnalysisWaveform::fillNextSixAntArrays(int ant, int nextSixAnts[6])
+void pueo::PrettyAnalysisWaveform::fillNextSixAntArrays(int ant, int nextSixAnts[6])
 {
 
+  std::cerr <<" FIXME: Not updated for PUEO yet" << std::endl;
   int top=-1,middle=-1,bottom=-1;
   int leftTop=-1, rightTop=-1;
   int leftLeftTop=-1, rightRightTop=-1;
@@ -220,30 +227,30 @@ void PrettyAnalysisWaveform::fillNextSixAntArrays(int ant, int nextSixAnts[6])
 
   if(ant<16) {
     top=ant;
-    middle=AnitaGeomTool::getAzimuthPartner(top);
+//FIXME    middle=AnitaGeomTool::getAzimuthPartner(top);
     bottom=middle+16;
   } else if (ant<32){
     middle = ant;
-    top = AnitaGeomTool::getAzimuthPartner(middle);
+//FIXME    top = AnitaGeomTool::getAzimuthPartner(middle);
     bottom=middle+16;
   } else {
     bottom=ant;
-    middle=AnitaGeomTool::getAzimuthPartner(bottom);
-    top=AnitaGeomTool::getAzimuthPartner(middle);
+//FIXME    middle=AnitaGeomTool::getAzimuthPartner(bottom);
+//FIXME    top=AnitaGeomTool::getAzimuthPartner(middle);
   }
 
 
   int crap;
   //  std::cout << top << "\t" << bottom << std::endl;
-  AnitaGeomTool::getThetaPartners(top,leftTop,rightTop);
-  AnitaGeomTool::getThetaPartners(middle,leftMiddle,rightMiddle);
-  AnitaGeomTool::getThetaPartners(bottom,leftBottom,rightBottom);
-  AnitaGeomTool::getThetaPartners(leftTop,leftLeftTop,crap);
-  AnitaGeomTool::getThetaPartners(rightTop,crap,rightRightTop);
-  AnitaGeomTool::getThetaPartners(leftMiddle,leftLeftMiddle,crap);
-  AnitaGeomTool::getThetaPartners(rightMiddle,crap,rightRightMiddle);
-  AnitaGeomTool::getThetaPartners(leftBottom,leftLeftBottom,crap);
-  AnitaGeomTool::getThetaPartners(rightBottom,crap,rightRightBottom);
+//FIXME  AnitaGeomTool::getThetaPartners(top,leftTop,rightTop);
+//FIXME  AnitaGeomTool::getThetaPartners(middle,leftMiddle,rightMiddle);
+//FIXME  AnitaGeomTool::getThetaPartners(bottom,leftBottom,rightBottom);
+//FIXME  AnitaGeomTool::getThetaPartners(leftTop,leftLeftTop,crap);
+//FIXME  AnitaGeomTool::getThetaPartners(rightTop,crap,rightRightTop);
+//FIXME  AnitaGeomTool::getThetaPartners(leftMiddle,leftLeftMiddle,crap);
+//FIXME  AnitaGeomTool::getThetaPartners(rightMiddle,crap,rightRightMiddle);
+//FIXME  AnitaGeomTool::getThetaPartners(leftBottom,leftLeftBottom,crap);
+//FIXME  AnitaGeomTool::getThetaPartners(rightBottom,crap,rightRightBottom);
   nextSixAnts[0]=leftLeftTop;
   nextSixAnts[1]=rightRightTop;
   nextSixAnts[2]=leftLeftMiddle;
@@ -254,22 +261,23 @@ void PrettyAnalysisWaveform::fillNextSixAntArrays(int ant, int nextSixAnts[6])
 }
 
 
-void PrettyAnalysisWaveform::fillNadirArrays(int ant, int nadirAnts[5])
+void pueo::PrettyAnalysisWaveform::fillNadirArrays(int ant, int nadirAnts[5])
 {
   //   std::cerr << "fillSixAntArrays( " << ant << ")\n";
  
   //some logic to convert from top to nadir (on or between antennas)
 
+  std::cerr <<" FIXME: Not updated for PUEO yet" << std::endl;
 
 
-  int nadirAntNums[NUM_PHI]={32,-1,33,-1,34,-1,35,-1,36,-1,37,-1,38,-1,39,-1};
+  int nadirAntNums[k::NUM_PHI]={32,-1,33,-1,34,-1,35,-1,36,-1,37,-1,38,-1,39,-1};
 
   int left = -1; int right = -1;
   int leftLeft = -1; int rightRight = -1;
   int antBottom = ant;  
 
     if(ant<16) {
-      antBottom=AnitaGeomTool::getAzimuthPartner(ant);
+//FIXME      antBottom=AnitaGeomTool::getAzimuthPartner(ant);
     }
       
     int nadir =  nadirAntNums[antBottom-16];
@@ -326,7 +334,7 @@ void PrettyAnalysisWaveform::fillNadirArrays(int ant, int nadirAnts[5])
 }
 
 //Putative Analysis methods
-int PrettyAnalysisWaveform::getMaxAntenna(AnitaPol::AnitaPol_t pol, Double_t *peakPtr)
+int pueo::PrettyAnalysisWaveform::getMaxAntenna(pol::pol_t pol, Double_t *peakPtr)
 {
   return getMaxAntennaCorrelationRollingAvg(pol, peakPtr);
   //  return getMaxAntennaCorrelation(pol, peakPtr);
@@ -334,38 +342,39 @@ int PrettyAnalysisWaveform::getMaxAntenna(AnitaPol::AnitaPol_t pol, Double_t *pe
 }   
 
 
-int PrettyAnalysisWaveform::getMaxAntennaVSquared(AnitaPol::AnitaPol_t pol, Double_t *peakPtr)
-{
+int pueo::PrettyAnalysisWaveform::getMaxAntennaVSquared(pol::pol_t pol, Double_t *peakPtr)
+{	 
    //Returns the antenna with the maximum power
    //Could consider changng this to make things better
    double maxVal=0;
    int maxAnt=0;
    for(int ant=0;ant<32;ant++) {
-      int chanIndex=AnitaGeomTool::getChanIndexFromAntPol(ant,pol);
-      Double_t rmsChan=TMath::RMS(useful->fNumPoints[chanIndex],useful->fVolts[chanIndex]);
-      for(int samp=0;samp<useful->fNumPoints[chanIndex];samp++) {
-	 double vSquared=useful->fVolts[chanIndex][samp]*useful->fVolts[chanIndex][samp];
-	 vSquared/=rmsChan;
-	 if(vSquared>maxVal) {
-	    maxVal=vSquared;
-	    maxAnt=ant;
-	 }
+      int chanIndex=GeomTool::getChanIndexFromAntPol(ant,pol);
+      Double_t rmsChan=TMath::RMS(useful->volts[chanIndex].size(),&useful->volts[chanIndex][0]);
+      for(int samp=0;samp<useful->volts[chanIndex].size();samp++) {
+        double vSquared=useful->volts[chanIndex][samp]*useful->volts[chanIndex][samp];
+        vSquared/=rmsChan;
+        if(vSquared>maxVal) {
+          maxVal=vSquared;
+          maxAnt=ant;
+        }
       }
    }
    if(peakPtr) *peakPtr=maxVal;
    return maxAnt;
 }
 
-int PrettyAnalysisWaveform::getMaxAntennaCorrelation(AnitaPol::AnitaPol_t pol, Double_t *peakPtr)
+int pueo::PrettyAnalysisWaveform::getMaxAntennaCorrelation(pol::pol_t pol, Double_t *peakPtr)
 {
    //Returns the antenna with the lagest peak/rms in the correlation with its azimuth partner antenna
    double maxVal=0;
    int maxAnt=0;
+   int otherAnt=-1,ciTop =-1,ciBottom = -1; 
    for(int ant=0;ant<16;ant++) {
       //Loop over the top antennas
-      int otherAnt=AnitaGeomTool::getAzimuthPartner(ant);
-      int ciTop=AnitaGeomTool::getChanIndexFromAntPol(ant,pol);
-      int ciBottom=AnitaGeomTool::getChanIndexFromAntPol(otherAnt,pol);
+//FIXME      int otherAnt=AnitaGeomTool::getAzimuthPartner(ant);
+//      int ciTop=AnitaGeomTool::getChanIndexFromAntPol(ant,pol);
+//      int ciBottom=AnitaGeomTool::getChanIndexFromAntPol(otherAnt,pol);
 
       AnalysisWaveform* wfCor = getCorrelation(ciTop,ciBottom);      
       TGraph* grCor = (TGraph*) wfCor->even();
@@ -376,8 +385,8 @@ int PrettyAnalysisWaveform::getMaxAntennaCorrelation(AnitaPol::AnitaPol_t pol, D
       if((peak/rms)>maxVal) {
 	 maxVal=peak/rms;
 	 maxAnt=ant;
-	 Double_t maxTop=TMath::MaxElement(useful->fNumPoints[ciTop],useful->fVolts[ciTop]);
-	 Double_t maxBottom=TMath::MaxElement(useful->fNumPoints[ciBottom],useful->fVolts[ciBottom]);
+	 Double_t maxTop=TMath::MaxElement(useful->volts[ciTop].size(),&useful->volts[ciTop][0]);
+	 Double_t maxBottom=TMath::MaxElement(useful->volts[ciBottom].size(),&useful->volts[ciBottom][0]);
 	 if(maxBottom>maxTop)
 	   maxAnt=otherAnt;
       }
@@ -389,18 +398,19 @@ int PrettyAnalysisWaveform::getMaxAntennaCorrelation(AnitaPol::AnitaPol_t pol, D
    return maxAnt;
 }
 
-int PrettyAnalysisWaveform::getMaxAntennaCorrelationRollingAvg(AnitaPol::AnitaPol_t pol, Double_t *peakPtr)
+int pueo::PrettyAnalysisWaveform::getMaxAntennaCorrelationRollingAvg(pol::pol_t pol, Double_t *peakPtr)
 {
    //Returns the antenna at the centre of three phi-secotrs with the largest peak/rms in the correlation with its azimuth partner antenna
    double maxVal=0;
    int maxAnt=0;
    double maxVals[16]={0};
+   int otherAnt = -1,ciTop = -1; 
    for(int ant=0;ant<16;ant++) {
       //Loop over the top antennas
-      int otherAnt=AnitaGeomTool::getAzimuthPartner(ant);
-      int ciTop=AnitaGeomTool::getChanIndexFromAntPol(ant,pol);
-      int ciMiddle=AnitaGeomTool::getChanIndexFromAntPol(otherAnt,pol);
-      int ciBottom=AnitaGeomTool::getChanIndexFromAntPol(otherAnt+16,pol);
+//FIXME      int otherAnt=GeomTool::getAzimuthPartner(ant);
+//FIXME      int ciTop=GeomTool::getChanIndexFromAntPol(ant,pol);
+      int ciMiddle=GeomTool::getChanIndexFromAntPol(otherAnt,pol);
+      int ciBottom=GeomTool::getChanIndexFromAntPol(otherAnt+16,pol);
 
       AnalysisWaveform* wfCor1 = getCorrelation(ciTop,ciMiddle);      
       TGraph* grCor1 = (TGraph*) wfCor1->even();
@@ -437,19 +447,19 @@ int PrettyAnalysisWaveform::getMaxAntennaCorrelationRollingAvg(AnitaPol::AnitaPo
      if(rightAnt>15) rightAnt=0;
 
 
-     int otherAnt=AnitaGeomTool::getAzimuthPartner(ant);
-     int ciTop=AnitaGeomTool::getChanIndexFromAntPol(ant,pol);
-     int ciMiddle=AnitaGeomTool::getChanIndexFromAntPol(otherAnt,pol);
-     int ciBottom=AnitaGeomTool::getChanIndexFromAntPol(otherAnt+16,pol);
+     int otherAnt=-1; //FIXME GeomTool::getAzimuthPartner(ant); 
+     int ciTop=GeomTool::getChanIndexFromAntPol(ant,pol);
+     int ciMiddle=GeomTool::getChanIndexFromAntPol(otherAnt,pol);
+     int ciBottom=GeomTool::getChanIndexFromAntPol(otherAnt+16,pol);
      
      Double_t newVal=maxVals[leftAnt]+maxVals[ant]+maxVals[rightAnt];
 
      if(newVal>maxVal) {
        maxVal=newVal;
        maxAnt=ant;
-       Double_t maxTop=TMath::MaxElement(useful->fNumPoints[ciTop],useful->fVolts[ciTop]);
-       Double_t maxMiddle=TMath::MaxElement(useful->fNumPoints[ciMiddle],useful->fVolts[ciMiddle]);
-       Double_t maxBottom=TMath::MaxElement(useful->fNumPoints[ciBottom],useful->fVolts[ciBottom]);
+       Double_t maxTop=TMath::MaxElement(useful->volts[ciTop].size(),&useful->volts[ciTop][0]);
+       Double_t maxMiddle=TMath::MaxElement(useful->volts[ciMiddle].size(),&useful->volts[ciMiddle][0]);
+       Double_t maxBottom=TMath::MaxElement(useful->volts[ciBottom].size(),&useful->volts[ciBottom][0]);
        if(maxTop>maxBottom && maxTop>maxMiddle) maxAnt = ant;
        else if (maxMiddle>maxBottom) maxAnt = otherAnt;
        else maxAnt=otherAnt+16;
@@ -460,21 +470,21 @@ int PrettyAnalysisWaveform::getMaxAntennaCorrelationRollingAvg(AnitaPol::AnitaPo
    return maxAnt;
 }
 
-double PrettyAnalysisWaveform::getHighestSnr(int centreAntenna)
+double pueo::PrettyAnalysisWaveform::getHighestSnr(int centreAntenna)
 {
 	while(centreAntenna>16) centreAntenna -= 16;
-	double vpptop=TMath::MaxElement(useful->fNumPoints[centreAntenna], useful->fVolts[centreAntenna]) - TMath::MinElement(useful->fNumPoints[centreAntenna], useful->fVolts[centreAntenna]);
-	double vppmid=TMath::MaxElement(useful->fNumPoints[centreAntenna+16], useful->fVolts[centreAntenna+16]) - TMath::MinElement(useful->fNumPoints[centreAntenna+16], useful->fVolts[centreAntenna+16]);
-	double vppbot=TMath::MaxElement(useful->fNumPoints[centreAntenna+32], useful->fVolts[centreAntenna+32]) - TMath::MinElement(useful->fNumPoints[centreAntenna+32], useful->fVolts[centreAntenna+32]);
-	int nPointsRms = useful->fNumPoints[centreAntenna]/5;
+	double vpptop=TMath::MaxElement(useful->volts[centreAntenna].size(), &useful->volts[centreAntenna][0]) - TMath::MinElement(useful->volts[centreAntenna].size(), &useful->volts[centreAntenna][0]);
+	double vppmid=TMath::MaxElement(useful->volts[centreAntenna+16].size(), &useful->volts[centreAntenna+16][0]) - TMath::MinElement(useful->volts[centreAntenna+16].size(), &useful->volts[centreAntenna+16][0]);
+	double vppbot=TMath::MaxElement(useful->volts[centreAntenna+32].size(), &useful->volts[centreAntenna+32][0]) - TMath::MinElement(useful->volts[centreAntenna+32].size(), &useful->volts[centreAntenna+32][0]);
+	int nPointsRms = useful->volts[centreAntenna].size()/5;
 	double snrtop=0;
 	double snrmid=0;
 	double snrbot=0;
 	for(int i = 0; i < nPointsRms; i++)
 	{
-		snrtop += useful->fVolts[centreAntenna][i]*useful->fVolts[centreAntenna][i]/double(nPointsRms);
-		snrmid += useful->fVolts[centreAntenna+16][i]*useful->fVolts[centreAntenna+16][i]/double(nPointsRms);
-		snrbot += useful->fVolts[centreAntenna+32][i]*useful->fVolts[centreAntenna+32][i]/double(nPointsRms);
+		snrtop += useful->volts[centreAntenna][i]*useful->volts[centreAntenna][i]/double(nPointsRms);
+		snrmid += useful->volts[centreAntenna+16][i]*useful->volts[centreAntenna+16][i]/double(nPointsRms);
+		snrbot += useful->volts[centreAntenna+32][i]*useful->volts[centreAntenna+32][i]/double(nPointsRms);
 	}
 	snrtop = vpptop/sqrt(snrtop);
 	snrmid = vppmid/sqrt(snrmid);
@@ -486,7 +496,7 @@ double PrettyAnalysisWaveform::getHighestSnr(int centreAntenna)
 	
 
 
-CorrelationSummaryAnita4 *PrettyAnalysisWaveform::getCorrelationSummaryAnita4(Int_t centreAnt,AnitaPol::AnitaPol_t pol, Int_t deltaT, Int_t eventNumber)
+pueo::CorrelationSummary* pueo::PrettyAnalysisWaveform::getCorrelationSummary(Int_t centreAnt,pol::pol_t pol, Int_t deltaT, Int_t eventNumber)
 {
   //Gets the 11 correlations and then takes the max, rms and neighbouring maxima
   if(centreAnt<0)
@@ -502,7 +512,7 @@ CorrelationSummaryAnita4 *PrettyAnalysisWaveform::getCorrelationSummaryAnita4(In
   int nextSixAnts[6];
   fillNextSixAntArrays(centreAnt,nextSixAnts);
 
-   CorrelationSummaryAnita4 *theSum = new CorrelationSummaryAnita4(eventNumber, centreAnt, nineAnts,deltaT, pol);
+   CorrelationSummary*theSum = new CorrelationSummary(eventNumber, centreAnt, nineAnts,deltaT, pol);
 	 theSum->setSnr(getHighestSnr(centreAnt));
 
    for(int i=0;i<6;i++)
@@ -629,8 +639,8 @@ CorrelationSummaryAnita4 *PrettyAnalysisWaveform::getCorrelationSummaryAnita4(In
    //Now can make correlations and find max, rms, etc.
    for(int corInd=0;corInd<NUM_CORRELATIONS_ANITA4;corInd++) {
       //      std::cout << corInd << "\t" << theSum->firstAnt[corInd] << "\t" << theSum->secondAnt[corInd] << "\n";
-      Int_t ci1=AnitaGeomTool::getChanIndexFromAntPol(theSum->firstAnt[corInd],pol);
-      Int_t ci2=AnitaGeomTool::getChanIndexFromAntPol(theSum->secondAnt[corInd],pol);
+      Int_t ci1=GeomTool::getChanIndexFromAntPol(theSum->firstAnt[corInd],pol);
+      Int_t ci2=GeomTool::getChanIndexFromAntPol(theSum->secondAnt[corInd],pol);
       //      std::cout << corInd << "\t"<< ci1 << " " << ci2 << "  " << theSum->firstAnt[corInd] << "\t" << theSum->secondAnt[corInd] <<std::endl;
 
 //       if (ci1*ci2<0) continue; // Linda added this condition
@@ -740,8 +750,8 @@ CorrelationSummaryAnita4 *PrettyAnalysisWaveform::getCorrelationSummaryAnita4(In
 
    // The better way is just use adu5 and get expected Wais theta and phi.
   Double_t phiWave,thetaWave;
-  UsefulAdu5Pat* usefulPat = new UsefulAdu5Pat(fPat);
-  usefulPat->getThetaAndPhiWave(AnitaLocations::LONGITUDE_WAIS_A4, AnitaLocations::LATITUDE_WAIS_A4, AnitaLocations::ALTITUDE_WAIS_A4, thetaWave, phiWave);
+  UsefulAttitude* usefulPat = new UsefulAttitude(fPat);
+  usefulPat->getThetaAndPhiWave(Locations::getWaisLongitude(), Locations::getWaisLatitude(), Locations::getWaisAltitude(), thetaWave, phiWave);
   theSum->thetaWave = thetaWave;
   theSum->phiWave = phiWave;
 

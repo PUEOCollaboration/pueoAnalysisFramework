@@ -394,11 +394,11 @@ void pueo::FilteredEvent::plotSummary(TCanvas * ch, TCanvas * cv) const
   }
 
 }
-int pueo::FilteredEvent::checkSaturation(std::bitset<k::NUM_HORNS> * save_hsat, std::bitset<k::NUM_HORNS> * save_vsat, double thresh) const
+int pueo::FilteredEvent::checkSaturation(std::bitset<k::NUM_ANTS> * save_hsat, std::bitset<k::NUM_ANTS> * save_vsat, double thresh) const
 {
   
-  std::bitset<k::NUM_HORNS> hsat = 0; 
-  std::bitset<k::NUM_HORNS> vsat = 0; 
+  std::bitset<k::NUM_ANTS> hsat = 0; 
+  std::bitset<k::NUM_ANTS> vsat = 0; 
 
   int totalsat = 0; 
   for (int i = 0; i < k::NUM_ANTS; i++) 

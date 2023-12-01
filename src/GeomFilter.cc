@@ -1,13 +1,13 @@
 
-#include "GeomFilter.h"
-#include "AnalysisWaveform.h" 
+#include "pueo/GeomFilter.h"
+#include "pueo/AnalysisWaveform.h" 
 #include "FFTWComplex.h" 
 #include "FFTtools.h"
 
 
 using namespace std;
 
-void GeometricFilter::process(FilteredAnitaEvent* event) {
+void pueo::GeometricFilter::process(FilteredEvent* event) {
   //printf("GeomFilter::process \n");
   double meanFreqVert = 0;
   double meanFreqHoriz = 0;
@@ -69,25 +69,25 @@ void GeometricFilter::process(FilteredAnitaEvent* event) {
 
 }
 
-void GeometricFilter::processOne(AnalysisWaveform* wf, const RawAnitaHeader * header, int ant, int pol) {
+void pueo::GeometricFilter::processOne(AnalysisWaveform* wf, const RawHeader * header, int ant, int pol) {
   printf("GeomFilter::processOne -- not implemented \n");
 }
 
 // TODO deprecate nadirFlag?
-void GeometricFilter::getNotchandBandwidth(int nfreq,double dbCut,int nAntennasToUse, int nadirFlag, float meanFreqVert, float meanFreqHoriz)  {
+void pueo::GeometricFilter::getNotchandBandwidth(int nfreq,double dbCut,int nAntennasToUse, int nadirFlag, float meanFreqVert, float meanFreqHoriz)  {
   //int printFlag = 0;
 //  printFlag=1;
   //printf("GeomFilter::getNotchAndBandwidth \n");   
   //printf("nfreq=%i, dbCut=%f, nAnt=%i, nadirFlag=%i \n", nfreq, dbCut, nAntennasToUse, nadirFlag);     
   
   std::vector<int> whichAntennasToUse (nAntennasToUse,0);
-  std::vector< std::vector<double> >antennaFreq(NUM_SEAVEYS, std::vector<double>(50));
-  std::vector< std::vector<double> >antennaFreqHoriz(NUM_SEAVEYS, std::vector<double>(50));
-  std::vector< std::vector<double> >antennaBandwidth(NUM_SEAVEYS, std::vector<double>(50));
-  std::vector< std::vector<double> >antennaBandwidthHoriz(NUM_SEAVEYS, std::vector<double>(50));
-  std::vector< std::vector<double> >PeakMag(NUM_SEAVEYS, std::vector<double>(50));
-  std::vector< std::vector<double> >PeakMag_backup(NUM_SEAVEYS, std::vector<double>(50));
-  std::vector< std::vector<double> >PeakMagHoriz(NUM_SEAVEYS, std::vector<double>(50));
+  std::vector< std::vector<double> >antennaFreq(k::NUM_ANTS, std::vector<double>(50));
+  std::vector< std::vector<double> >antennaFreqHoriz(k::NUM_ANTS, std::vector<double>(50));
+  std::vector< std::vector<double> >antennaBandwidth(k::NUM_ANTS, std::vector<double>(50));
+  std::vector< std::vector<double> >antennaBandwidthHoriz(k::NUM_ANTS, std::vector<double>(50));
+  std::vector< std::vector<double> >PeakMag(k::NUM_ANTS, std::vector<double>(50));
+  std::vector< std::vector<double> >PeakMag_backup(k::NUM_ANTS, std::vector<double>(50));
+  std::vector< std::vector<double> >PeakMagHoriz(k::NUM_ANTS, std::vector<double>(50));
   
   
   std::vector<double> uniquefreqs;
@@ -164,7 +164,7 @@ void GeometricFilter::getNotchandBandwidth(int nfreq,double dbCut,int nAntennasT
   notchFreqs_Horiz.clear(); 
   notchPhase_Horiz.clear(); 
   notchPhaseBands_Horiz.clear(); 
-  for(int i =0;i<NUM_SEAVEYS;i++){//WE have all possible freqs to cut. Let go through each antenna and make sense of them
+  for(int i =0;i<k::NUM_ANTS;i++){//WE have all possible freqs to cut. Let go through each antenna and make sense of them
     uniquefreqs.clear();//zero stuff
      
     uniquefreqsHoriz.clear();
@@ -207,7 +207,7 @@ void GeometricFilter::getNotchandBandwidth(int nfreq,double dbCut,int nAntennasT
   
 }
 
-void GeometricFilter::getGroupsofAntennas(int nAntennasToUse, int nadirFlag){//gets unique groups of Antennas
+void pueo::GeometricFilter::getGroupsofAntennas(int nAntennasToUse, int nadirFlag){//gets unique groups of Antennas
   //int antenna_group_tmp [nAntennasToUse];//for use in getClosestN function
   std::vector<int> antenna_group (nAntennasToUse,0);//used for sorting and comparison
   int old_group_switch=0;
@@ -242,7 +242,7 @@ void GeometricFilter::getGroupsofAntennas(int nAntennasToUse, int nadirFlag){//g
 
 }
 
-double getMaximum(int n, double *array, int &index){
+static double getMaximum(int n, double *array, int &index){
   double max;
   max=array[0];
   index=0;
@@ -256,10 +256,10 @@ double getMaximum(int n, double *array, int &index){
 }
 
 
-void GeometricFilter::getClosestNAntennas(int nantennasToUse, double peakPhi, vector<int>& whichAntennasToUse, int nadirFlag)
+void pueo::GeometricFilter::getClosestNAntennas(int nantennasToUse, double peakPhi, vector<int>& whichAntennasToUse, int nadirFlag)
 {
 
-  int nantennasTotal=NUM_SEAVEYS;
+  int nantennasTotal=k::NUM_ANTS;
   //if (nadirFlag==1) nantennasTotal=NUM_ANTS_WITH_NADIRS;
   //if (nadirFlag==0) nantennasTotal=NUM_ANTS_NO_NADIRS;
   
@@ -272,23 +272,23 @@ void GeometricFilter::getClosestNAntennas(int nantennasToUse, double peakPhi, ve
   for (int i=0;i<nantennasToUse;i++){
     deltaPhiArray[i]=360;//set array full of large values
   }
-  ULong64_t saturated[2] = {0,0};
+  std::bitset<k::NUM_ANTS> saturated[2] = {0,0};
   //const UsefulAnitaEvent* usefulEvent = currentEvent->getUsefulAnitaEvent();
-  currentEvent->checkSaturation( &saturated[AnitaPol::kHorizontal], 
-                                 &saturated[AnitaPol::kVertical], 
+  currentEvent->checkSaturation( &saturated[pol::kHorizontal], 
+                                 &saturated[pol::kVertical], 
                                  1500);   
   // TODO populate saturated channels array by iterating through bit variables
 //  printf("saturation hpol: %li   vpol: %li\n", saturated[0], saturated[1]);
   // horrible temporary hack code
-  //int saturatedChannels[2*NUM_SEAVEYS] = {0};  
+  //int saturatedChannels[2*k::NUM_ANTS] = {0};  
   int polToggle = 0;  // TODO maye iterate on this?
   // end of horrible temporary hack code
   for (int ant=0;ant<nantennasTotal;ant++){
     //cout<<"ant is "<<ant<<"\n";
-    //if (ant!=1 && saturatedChannels[ant+polToggle*NUM_SEAVEYS]==0){
-    if (saturatedChannels[ant+polToggle*NUM_SEAVEYS]==0){       //TODO really check saturation
+    //if (ant!=1 && saturatedChannels[ant+polToggle*k::NUM_ANTS]==0){
+    if (saturatedChannels[ant+polToggle*k::NUM_ANTS]==0){       //TODO really check saturation
       //phi_ant[ant]=fUPGeomTool->getAntPhiPositionRelToAftFore(ant);
-      phi_ant[ant]=AnitaGeomTool::Instance()->getAntPhiPositionRelToAftFore(ant);
+      phi_ant[ant]=GeomTool::Instance().getAntPhiPositionRelToAftFore(ant);
       deltaPhiThisOne=phi_ant[ant]*180.0/M_PI-peakPhi;
      
       if (deltaPhiThisOne>180.) deltaPhiThisOne-=360.;
@@ -304,7 +304,7 @@ void GeometricFilter::getClosestNAntennas(int nantennasToUse, double peakPhi, ve
 }
 
 ///////////////////////////////////////
-void GeometricFilter::adaptiveFilterPartialPayload(int pol, double dBCut, int nfreq,double *frequencies,double *bandwidth,double *magPeak,int nantennasToUse,vector<int>& whichAntennasToUse, float &mean_freq)//identifies CW frequencies and size of notch for group of antennas
+void pueo::GeometricFilter::adaptiveFilterPartialPayload(int pol, double dBCut, int nfreq,double *frequencies,double *bandwidth,double *magPeak,int nantennasToUse,vector<int>& whichAntennasToUse, float &mean_freq)//identifies CW frequencies and size of notch for group of antennas
 {
   //printf("in GeometricFilter::adaptiveFilterPartialPayload \n");
   // use class variable AnalysisWaveform array "noise" instead
@@ -342,7 +342,7 @@ void GeometricFilter::adaptiveFilterPartialPayload(int pol, double dBCut, int nf
   // for (int ant=0;ant<NUM_ANTS_WITH_NADIRS;ant++){  
   for (int ctr=0;ctr<nantennasToUse;ctr++){
     ant=whichAntennasToUse[ctr];
-    AnalysisWaveform* rawAWF = getWf(currentEvent, ant, (AnitaPol::AnitaPol_t)pol);
+    AnalysisWaveform* rawAWF = getWf(currentEvent, ant, (pol::pol_t)pol);
     AnalysisWaveform* thisAWF = new AnalysisWaveform(*rawAWF);
     thisAWF->forceEvenSize(240);
     const TGraphAligned* thisPower = thisAWF->power();
@@ -351,9 +351,9 @@ void GeometricFilter::adaptiveFilterPartialPayload(int pol, double dBCut, int nf
       //deltaT = thisAWF->deltaT();
       newLength = thisPower->GetN();
     }
-    //if ((pol!=0 || ant!=1) && saturatedChannels[ant+pol*NUM_SEAVEYS]==0){//get rid of 2V and ant 1 in vert
+    //if ((pol!=0 || ant!=1) && saturatedChannels[ant+pol*k::NUM_ANTS]==0){//get rid of 2V and ant 1 in vert
     // TODO check saturation for real here - just apply the max criterion and forget the saturation[] array
-    if (saturatedChannels[ant+pol*NUM_SEAVEYS]==0){// 
+    if (saturatedChannels[ant+pol*k::NUM_ANTS]==0){// 
       // should not need to do the FFT; 
       //   magFFT wants dB
       /*
@@ -699,7 +699,7 @@ void GeometricFilter::adaptiveFilterPartialPayload(int pol, double dBCut, int nf
 
 //////////-----------------------------------------------------------------------------------------------------------------------------------------
 
-void GeometricFilter::getFrequenciestoCut(int antenna,vector< vector<double> > &antennaFreq,vector< vector<double> > &bandwidth, vector< vector<double> > &PeakMag, vector<double> &uniquefreqs,vector<double> &uniquebandwidth, int nfreq, vector<double> &uniquePhase, vector<double> &uniquePhase_bandwidth) {//Get rid of Duplicates and combines overlapping notches
+void pueo::GeometricFilter::getFrequenciestoCut(int antenna,vector< vector<double> > &antennaFreq,vector< vector<double> > &bandwidth, vector< vector<double> > &PeakMag, vector<double> &uniquefreqs,vector<double> &uniquebandwidth, int nfreq, vector<double> &uniquePhase, vector<double> &uniquePhase_bandwidth) {//Get rid of Duplicates and combines overlapping notches
   //printf("in GeometricFilter::getFrequenciesToCut");
   //printf(" antenna %i \n", antenna);
   double max=0.;
@@ -839,11 +839,11 @@ void GeometricFilter::getFrequenciestoCut(int antenna,vector< vector<double> > &
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void GeometricFilter::applyAdaptiveFilter_singleAnt(double centerFrequency, double bandWidth, int polFlag,int ant) //function to call coorrect filter and change graphs
+void pueo::GeometricFilter::applyAdaptiveFilter_singleAnt(double centerFrequency, double bandWidth, int polFlag,int ant) //function to call coorrect filter and change graphs
 {
   
   // TODO instead of grEv as event graph, use unfiltered, evenly-sampled waveform from FilteredAnitaEvent (getWf(currentEvent, ant, pol))
-  AnalysisWaveform* thisAWF = getWf(currentEvent, ant, (AnitaPol::AnitaPol_t)polFlag);
+  AnalysisWaveform* thisAWF = getWf(currentEvent, ant, (pol::pol_t)polFlag);
   if (polFlag==0){
     if (centerFrequency!=-1){
       //TGraph *gr1 = new TGraph(grEv[ant]->GetN(),grEv[ant]->GetX(),grEv[ant]->GetY());
@@ -879,7 +879,7 @@ void GeometricFilter::applyAdaptiveFilter_singleAnt(double centerFrequency, doub
 ////////-----------------------------------------------------------------------------------------------------------
 
 ////////-----------------------------------------------------------------------------------------------------------
-TGraph * GeometricFilter::interpolatedFilter(TGraph *grWave, Double_t minFreq, Double_t maxFreq) //interpolated filter. Do interpolation across notch
+TGraph * pueo::GeometricFilter::interpolatedFilter(TGraph *grWave, Double_t minFreq, Double_t maxFreq) //interpolated filter. Do interpolation across notch
 {
   if(maxFreq>1200){
     maxFreq=1200;
@@ -974,7 +974,7 @@ TGraph * GeometricFilter::interpolatedFilter(TGraph *grWave, Double_t minFreq, D
 
 /////-------------------------------------------------------------------------------------------------------------------
 
-void GeometricFilter::GeomMethod(int ant,int pol,vector<double> Freq,vector<double> bandWidth,vector<double> cutFreqs){ //geom method for phase filtering
+void pueo::GeometricFilter::GeomMethod(int ant,int pol,vector<double> Freq,vector<double> bandWidth,vector<double> cutFreqs){ //geom method for phase filtering
   double minFreq;// = Freq - bandWidth;
   double maxFreq;// = Freq + bandWidth;
   double magFFT[2000]={0};
@@ -993,7 +993,7 @@ void GeometricFilter::GeomMethod(int ant,int pol,vector<double> Freq,vector<doub
    
   double delta; 
   //printf("getting waveform event %i antenna %i pol %i \n", currentEvent->eventNumber,  ant, pol);
-  AnalysisWaveform* thisAWF = getWf(currentEvent, ant, (AnitaPol::AnitaPol_t) pol);
+  AnalysisWaveform* thisAWF = getWf(currentEvent, ant, (pol::pol_t) pol);
   //if(pol==0){
   //  length = grEv[ant]->GetN();
   //}
@@ -1253,7 +1253,7 @@ void GeometricFilter::GeomMethod(int ant,int pol,vector<double> Freq,vector<doub
 
 /////////------------------------------------------------------------------------------------------------------------------------
 
-double GeometricFilter::solveGamma_plus(double theta, double psi, double delta) {
+double pueo::GeometricFilter::solveGamma_plus(double theta, double psi, double delta) {
   double gamma;
   double sqrt_val;
   double sin_delta = sin(delta);
@@ -1270,7 +1270,7 @@ double GeometricFilter::solveGamma_plus(double theta, double psi, double delta) 
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
-double GeometricFilter::solveGamma_minus(double theta, double psi, double delta) {
+double pueo::GeometricFilter::solveGamma_minus(double theta, double psi, double delta) {
   double gamma;
   double sqrt_val;
   double sin_delta = sin(delta);

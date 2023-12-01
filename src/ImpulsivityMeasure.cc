@@ -1,11 +1,11 @@
-#include "ImpulsivityMeasure.h" 
-#include "AnalysisWaveform.h" 
+#include "pueo/ImpulsivityMeasure.h" 
+#include "pueo/AnalysisWaveform.h" 
 #include "TH2.h" 
 #include <algorithm> 
 #include <cmath>
 
 
-double impulsivity::impulsivityMeasure(const AnalysisWaveform * wf, TGraph * distance_cdf,int pt, bool hilbert) 
+double pueo::impulsivity::impulsivityMeasure(const AnalysisWaveform * wf, TGraph * distance_cdf,int pt, bool hilbert) 
 {
 
   const TGraphAligned * g = hilbert ? wf->hilbertEnvelope() : wf->even(); 
@@ -64,7 +64,7 @@ double impulsivity::impulsivityMeasure(const AnalysisWaveform * wf, TGraph * dis
 
 
 
-TH2* impulsivity::envelopogram(const AnalysisWaveform * wf, TH2 * out, int min, int max, int step, bool hilbert)
+TH2* pueo::impulsivity::envelopogram(const AnalysisWaveform * wf, TH2 * out, int min, int max, int step, bool hilbert)
 {
 
   /* Sanity check inputs */ 

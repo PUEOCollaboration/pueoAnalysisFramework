@@ -1,4 +1,4 @@
-#include "SensitivityCalculator.h" 
+#include "pueo/SensitivityCalculator.h" 
 #include "TGraphErrors.h" 
 #include "TAxis.h" 
 #include "TH1.h" 
@@ -11,7 +11,7 @@
 #endif
 
 
-SensitivityCalculator::~SensitivityCalculator() 
+pueo::SensitivityCalculator::~SensitivityCalculator() 
 {
 #ifdef USE_ROOSTATS
 
@@ -21,7 +21,7 @@ SensitivityCalculator::~SensitivityCalculator()
 
 
 
-SensitivityCalculator::SensitivityCalculator(double CL, bool FC) 
+pueo::SensitivityCalculator::SensitivityCalculator(double CL, bool FC) 
 {
   cl = CL;
   use_fc = FC; 
@@ -83,7 +83,7 @@ SensitivityCalculator::SensitivityCalculator(double CL, bool FC)
 
 }  
 
-void SensitivityCalculator::SensitivityCalculator::setThermalBackground(int nobs, double tau) 
+void pueo::SensitivityCalculator::SensitivityCalculator::setThermalBackground(int nobs, double tau) 
 {
 #ifdef USE_ROOSTATS
   w->var("tauthermal")->setVal(tau); 
@@ -92,7 +92,7 @@ void SensitivityCalculator::SensitivityCalculator::setThermalBackground(int nobs
 }
 
 
-void SensitivityCalculator::SensitivityCalculator::setAnthroBackground(int nobs, double tau, double sigma_tau)
+void pueo::SensitivityCalculator::SensitivityCalculator::setAnthroBackground(int nobs, double tau, double sigma_tau)
 {
 #ifdef USE_ROOSTATS
   w->var("mean_tauanthro")->setVal(tau); 
@@ -102,7 +102,7 @@ void SensitivityCalculator::SensitivityCalculator::setAnthroBackground(int nobs,
 
 }
 
-void SensitivityCalculator::SensitivityCalculator::setEfficiency(double mean, double sigma)
+void pueo::SensitivityCalculator::SensitivityCalculator::setEfficiency(double mean, double sigma)
 {
 #ifdef USE_ROOSTATS
   if (sigma == 0) 
@@ -122,7 +122,7 @@ void SensitivityCalculator::SensitivityCalculator::setEfficiency(double mean, do
 
 
 
-double SensitivityCalculator::getLimit(int nobs, double * lower, double * upper) 
+double pueo::SensitivityCalculator::getLimit(int nobs, double * lower, double * upper) 
 {
 #ifdef USE_ROOSTATS
   w->var("s")->setConstant(false); 
@@ -170,7 +170,7 @@ double SensitivityCalculator::getLimit(int nobs, double * lower, double * upper)
 }
 
 
-TGraphErrors * SensitivityCalculator::confidenceBands(int start, int stop) 
+TGraphErrors * pueo::SensitivityCalculator::confidenceBands(int start, int stop) 
 {
   TGraphErrors * g = new TGraphErrors(stop-start+1); 
   g->SetMarkerStyle(0); 
@@ -194,7 +194,7 @@ TGraphErrors * SensitivityCalculator::confidenceBands(int start, int stop)
 }
 
 
-TH1 * SensitivityCalculator::histBAnthro() 
+TH1 * pueo::SensitivityCalculator::histBAnthro() 
 {
 #ifdef USE_ROOSTATS
   RooDataSet * data = w->pdf("model")->generate(*w->set("bkg_anthro"),10000); 
@@ -207,7 +207,7 @@ TH1 * SensitivityCalculator::histBAnthro()
 #endif
 }
 
-TH1 * SensitivityCalculator::histBThermal() 
+TH1 * pueo::SensitivityCalculator::histBThermal() 
 {
 #ifdef USE_ROOSTATS
   RooDataSet * data = w->pdf("model")->generate(*w->set("bkg_thermal"),10000); 
@@ -220,7 +220,7 @@ TH1 * SensitivityCalculator::histBThermal()
 #endif 
 }
 
-TH1 * SensitivityCalculator::histBTotal() 
+TH1 * pueo::SensitivityCalculator::histBTotal() 
 {
   TH1 * banthro = histBAnthro(); 
   TH1 * bthermal = histBThermal(); 
@@ -239,7 +239,7 @@ TH1 * SensitivityCalculator::histBTotal()
 
 
 
-TH1 * SensitivityCalculator::histNObserved(double S)
+TH1 * pueo::SensitivityCalculator::histNObserved(double S)
 {
 #ifdef USE_ROOSTATS
 

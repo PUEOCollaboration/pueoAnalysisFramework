@@ -1,9 +1,10 @@
-#include "NoiseMonitor.h"
-#include "FilteredAnitaEvent.h"
-#include "RawAnitaHeader.h"
-#include "FilterStrategy.h"
-#include "FilterOperation.h"
-#include "AnitaDataset.h"
+#include "pueo/NoiseMonitor.h"
+#include "pueo/FilteredEvent.h"
+#include "pueo/RawHeader.h"
+#include "pueo/FilterStrategy.h"
+#include "pueo/FilterOperation.h"
+#include "pueo/Dataset.h"
+#include "pueo/Conventions.h" 
 #include <numeric>
 
 #include "TTree.h"
@@ -11,18 +12,18 @@
 #include "TProfile2D.h"
 #include <stdlib.h>
 
-void NoiseMonitor::getRmsDirEnv(){
-  fRmsDir = getenv("ANITA_RMS_DIR");
+void pueo::NoiseMonitor::getRmsDirEnv(){
+  fRmsDir = getenv("PUEO_RMS_DIR");
   if(!fRmsDir){
     std::cerr << "Warning in " << __PRETTY_FUNCTION__
-              << ", can't see env ANITA_RMS_DIR. "
+              << ", can't see env PUEO_RMS_DIR. "
               << "Will look for/make rms profiles in pwd"
               << std::endl;
     fRmsDir = ".";
   }
 }
 
-UInt_t NoiseMonitor::makeStratHashFromDesc(const FilterStrategy* fs){
+UInt_t pueo::NoiseMonitor::makeStratHashFromDesc(const FilterStrategy* fs){
   TString hasher;
   for(unsigned i=0; i < fs->nOperations(); i++){
     hasher += fs->getOperation(i)->description();
@@ -32,11 +33,11 @@ UInt_t NoiseMonitor::makeStratHashFromDesc(const FilterStrategy* fs){
 }
 
 
-TString NoiseMonitor::getFileName(int run){
-  return TString::Format("%s/rms_anita%d_run%d_hash%u.root", fRmsDir, AnitaVersion::get(), run, fHash);
+TString pueo::NoiseMonitor::getFileName(int run){
+  return TString::Format("%s/rms_pueo%d_run%d_hash%u.root", fRmsDir, version::get(), run, fHash);
 }
 
-void NoiseMonitor::getProfilesFromFileRun(int run){
+void pueo::NoiseMonitor::getProfilesFromFileRun(int run){
 
   TString theRootPwd = gDirectory->GetPath();
   TString fileName = getFileName(run);
@@ -47,26 +48,26 @@ void NoiseMonitor::getProfilesFromFileRun(int run){
 
   ProfPair p;
   if(fFile){
-    TProfile2D* pH = (TProfile2D*) fFile->Get(getHistName(AnitaPol::kHorizontal, run));
-    TProfile2D* pV = (TProfile2D*) fFile->Get(getHistName(AnitaPol::kVertical, run));
+    TProfile2D* pH = (TProfile2D*) fFile->Get(getHistName(pol::kHorizontal, run));
+    TProfile2D* pV = (TProfile2D*) fFile->Get(getHistName(pol::kVertical, run));
     p.set(pH, pV);
   }
   else{
     std::cerr << "Warning in " << __PRETTY_FUNCTION__ << ", couldn't find file " << fileName << ", will need to generate it. This may take some time." << std::endl;
   }
 
-  if(!p.get(AnitaPol::kVertical) || !p.get(AnitaPol::kHorizontal)){
+  if(!p.get(pol::kVertical) || !p.get(pol::kHorizontal)){
     std::cerr << "Error! unable to get the profiles I just tried to read for run " << run << ", "
-              << p.get(AnitaPol::kVertical) << ", " << p.get(AnitaPol::kHorizontal) << std::endl;
+              << p.get(pol::kVertical) << ", " << p.get(pol::kHorizontal) << std::endl;
     makeProfiles(run);
 
     fFile = TFile::Open(fileName);
-    TProfile2D* pH = (TProfile2D*) fFile->Get(getHistName(AnitaPol::kHorizontal, run));
-    TProfile2D* pV = (TProfile2D*) fFile->Get(getHistName(AnitaPol::kVertical, run));
+    TProfile2D* pH = (TProfile2D*) fFile->Get(getHistName(pol::kHorizontal, run));
+    TProfile2D* pV = (TProfile2D*) fFile->Get(getHistName(pol::kVertical, run));
     p.set(pH, pV);
   }
 
-  if(!p.get(AnitaPol::kVertical) || !p.get(AnitaPol::kHorizontal)){
+  if(!p.get(pol::kVertical) || !p.get(pol::kHorizontal)){
     std::cerr << "Warning in " << __PRETTY_FUNCTION__
               << ", unable to find RMS profiles for run " << run
               << ". Something bad is about to happen!"
@@ -80,24 +81,24 @@ void NoiseMonitor::getProfilesFromFileRun(int run){
 }
 
 
-TString NoiseMonitor::getHistName(AnitaPol::AnitaPol_t pol, int run){
+TString pueo::NoiseMonitor::getHistName(pol::pol_t pol, int run){
   TString name = TString::Format("rms?_%d_%u", run, fHash);
   const Ssiz_t namePolCharPos = name.First('?');
-  name[namePolCharPos] = AnitaPol::polAsChar(pol);
+  name[namePolCharPos] = pol::asChar(pol);
   return name;
 }
 
 
-void NoiseMonitor::makeProfiles(int run){
+void pueo::NoiseMonitor::makeProfiles(int run){
 
   TString fileName = getFileName(run);
 
   std::cout << "Info in " << __PRETTY_FUNCTION__ << ", generating minimim bias RMS profiles for run " << run << " in file " << fileName << std::endl;
   TFile* f = TFile::Open(fileName, "recreate");
 
-  AnitaDataset d(run);
+  Dataset d(run);
   const int n = d.N();
-  RawAnitaHeader* header = NULL;
+  RawHeader* header = NULL;
 
   d.first();
   header = d.header();
@@ -120,14 +121,14 @@ void NoiseMonitor::makeProfiles(int run){
 
   const Ssiz_t titlePolCharPos = title.First('?');
 
-  std::vector<TProfile2D*> profs(AnitaPol::kNotAPol, NULL);
-  for(int polInd=0; polInd < AnitaPol::kNotAPol; polInd++){
-    AnitaPol::AnitaPol_t pol = (AnitaPol::AnitaPol_t) polInd;
+  std::vector<TProfile2D*> profs(pol::kNotAPol, NULL);
+  for(int polInd=0; polInd < pol::kNotAPol; polInd++){
+    pol::pol_t pol = (pol::pol_t) polInd;
 
     TString name = getHistName(pol, run);
 
-    title[titlePolCharPos] = AnitaPol::polAsChar(pol);
-    profs.at(pol) = new TProfile2D(name, title, NUM_SEAVEYS, -0.5, NUM_SEAVEYS-0.5, nBin, startTime, endTime);
+    title[titlePolCharPos] = pol::asChar(pol);
+    profs.at(pol) = new TProfile2D(name, title, k::NUM_ANTS, -0.5, k::NUM_ANTS-0.5, nBin, startTime, endTime);
   }
 
   const double deltaPrint = double(n)/1000;
@@ -136,13 +137,13 @@ void NoiseMonitor::makeProfiles(int run){
   for(int entry=0; entry < n; entry++){
     d.getEntry(entry);
     header = d.header();
-    if(header->getTriggerBitRF()==0){
+    if(!trigger::isRFTrigger(header->trigType)){
 
-      FilteredAnitaEvent fEv(d.useful(), fFilterStrat, d.gps(), header);
-      for(int polInd=0; polInd < AnitaPol::kNotAPol; polInd++){
-        AnitaPol::AnitaPol_t pol = (AnitaPol::AnitaPol_t) polInd;
+      FilteredEvent fEv(d.useful(), fFilterStrat, d.gps(), header);
+      for(int polInd=0; polInd < pol::kNotAPol; polInd++){
+        pol::pol_t pol = (pol::pol_t) polInd;
 
-        for(int ant=0; ant < NUM_SEAVEYS; ant++){
+        for(int ant=0; ant < k::NUM_ANTS; ant++){
           const AnalysisWaveform* wf = fEv.getFilteredGraph(ant, pol);
           const TGraphAligned* gr = wf->even();
           double rms = TMath::RMS(gr->GetN(), gr->GetY());
@@ -189,7 +190,7 @@ void NoiseMonitor::makeProfiles(int run){
  * 
  * @param fs is the filter strategy we want to use to get the waveform RMSs
  */
-NoiseMonitor::NoiseMonitor(FilterStrategy* fs)
+pueo::NoiseMonitor::NoiseMonitor(FilterStrategy* fs)
     : fFilterStrat(fs), fFile(NULL)
 {
   getRmsDirEnv();
@@ -200,11 +201,11 @@ NoiseMonitor::NoiseMonitor(FilterStrategy* fs)
 
 /** 
  * Default constructor, requires a filter strategy
- * If you pass it a hash which doesn't match something in ANITA_RMS_DIR, it won't end well
+ * If you pass it a hash which doesn't match something in PUEO_RMS_DIR, it won't end well
  * 
  * @param fs is the filter strategy we want to use to get the waveform RMSs
  */
-NoiseMonitor::NoiseMonitor(UInt_t hash)
+pueo::NoiseMonitor::NoiseMonitor(UInt_t hash)
     : fFilterStrat(NULL), fFile(NULL)
 {
   getRmsDirEnv();
@@ -217,7 +218,7 @@ NoiseMonitor::NoiseMonitor(UInt_t hash)
 /** 
  * Destructor.
  */
-NoiseMonitor::~NoiseMonitor(){
+pueo::NoiseMonitor::~NoiseMonitor(){
 
   // std::map<int, TFile*>::iterator it;
   // for(it = fFiles.begin(); it != fFiles.end(); it++){
@@ -263,15 +264,15 @@ NoiseMonitor::~NoiseMonitor(){
 // }
 
 
-void NoiseMonitor::getProfilesFromFileTime(UInt_t realTime){
-  int run = AnitaDataset::getRunAtTime(double(realTime));
+void pueo::NoiseMonitor::getProfilesFromFileTime(UInt_t realTime){
+  int run = Dataset::getRunAtTime(double(realTime));
   getProfilesFromFileRun(run); // update fCurrent
 }
 
 
-double NoiseMonitor::getRMS(AnitaPol::AnitaPol_t pol, Int_t ant, UInt_t realTime){
+double pueo::NoiseMonitor::getRMS(pol::pol_t pol, Int_t ant, UInt_t realTime){
 
-  AnitaVersion::setVersionFromUnixTime(realTime);
+  version::setVersionFromUnixTime(realTime);
 
   const TProfile2D* p = fCurrent.get(pol);
   
@@ -290,7 +291,7 @@ double NoiseMonitor::getRMS(AnitaPol::AnitaPol_t pol, Int_t ant, UInt_t realTime
 }
 
 
-void NoiseMonitor::ProfPair::set(const TProfile2D* h, const TProfile2D* v){
+void pueo::NoiseMonitor::ProfPair::set(const TProfile2D* h, const TProfile2D* v){
 
   H = const_cast<TProfile2D*>(h);
   V = const_cast<TProfile2D*>(v);
@@ -327,8 +328,8 @@ void NoiseMonitor::ProfPair::set(const TProfile2D* h, const TProfile2D* v){
   // V->GetXaxis()->LabelsOption("h");
 }
 
-void NoiseMonitor::ProfPair::set(const ProfPair& other){
+void pueo::NoiseMonitor::ProfPair::set(const ProfPair& other){
 
-  set(other.get(AnitaPol::kHorizontal), other.get(AnitaPol::kVertical));
+  set(other.get(pol::kHorizontal), other.get(pol::kVertical));
   
 }

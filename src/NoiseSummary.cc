@@ -24,7 +24,7 @@ void pueo::NoiseSummary::zeroInternals() {
 
   fifoLength=0;
 
-  memset(avgRMSNoise,0,k::NUM_HORNS*k::NUM_POLS*sizeof(double));
+  memset(avgRMSNoise,0,k::NUM_ANTS*k::NUM_POLS*sizeof(double));
 
   for (int poli=0; poli<k::NUM_POLS; poli++) {
     if (avgMapProf[poli] != NULL) {
