@@ -232,6 +232,7 @@ double pueo::FilteredEvent::getAveragePower(pol::pol_t pol, ring::ring_t ring, b
 double pueo::FilteredEvent::getMedianPower(pol::pol_t pol, ring::ring_t ring, bool filtered) const
 {
 
+  return 0; // FIXME this doesn't work yet
   pol::pol_t pol_start =pol == pol::kVertical ? pol::kVertical : pol::kHorizontal;
   pol::pol_t pol_end = pol == pol::kHorizontal ? pol::kHorizontal : pol::kVertical;
 
@@ -249,7 +250,7 @@ double pueo::FilteredEvent::getMedianPower(pol::pol_t pol, ring::ring_t ring, bo
     for (int ant = 0; ant < k::NUM_ANTS; ant++)
     {
       if (ring != ring::kNotARing && geom.getRingFromAnt(ant) != ring) continue;
-      vals[i++] = ( filtered ?  filteredGraphsByAntPol[pol][ant]->even() : rawGraphsByAntPol[pol][ant]->uneven())->getSumV2();
+      vals[i++] = ( filtered ?  filteredGraphsByAntPol[pol][ant]->even() : rawGraphsByAntPol[pol][ant]->even())->getSumV2();
     }
   }
 
