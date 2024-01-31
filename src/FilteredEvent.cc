@@ -213,12 +213,13 @@ double pueo::FilteredEvent::getAveragePower(pol::pol_t pol, ring::ring_t ring, b
 
   int n = k::NUM_ANTS * (int(pol_end) - int(pol_start) +1);
   if (ring != ring::kNotARing) n/=ring::kNotARing;
+  auto geom = GeomTool::Instance();
 
   for (int pol = (int) pol_start; pol <=(int) pol_end; pol++ )
   {
     for (int ant = 0; ant < k::NUM_ANTS; ant++)
     {
-      if (ring != ring::kNotARing && pueo::GeomTool::getRingFromAnt(ant) != ring) continue;
+      if (ring != ring::kNotARing && geom.getRingFromAnt(ant) != ring) continue;
       sum += ( filtered ?  filteredGraphsByAntPol[pol][ant]->even() : rawGraphsByAntPol[pol][ant]->uneven())->getSumV2();
     }
   }
@@ -241,12 +242,13 @@ double pueo::FilteredEvent::getMedianPower(pol::pol_t pol, ring::ring_t ring, bo
   double vals[n];
 
 
+  auto geom = GeomTool::Instance(); 
   int i = 0;
   for (int pol = (int) pol_start; pol <=(int) pol_end; pol++ )
   {
     for (int ant = 0; ant < k::NUM_ANTS; ant++)
     {
-      if (ring != ring::kNotARing && pueo::GeomTool::getRingFromAnt(ant) != ring) continue;
+      if (ring != ring::kNotARing && geom.getRingFromAnt(ant) != ring) continue;
       vals[i++] = ( filtered ?  filteredGraphsByAntPol[pol][ant]->even() : rawGraphsByAntPol[pol][ant]->uneven())->getSumV2();
     }
   }
@@ -331,13 +333,14 @@ void pueo::FilteredEvent::getMinMaxRatio(pol::pol_t pol, double * max_ratio, dou
 
   int greater = 0; 
 
+  auto geom = GeomTool::Instance(); 
 
   for (int i = 0; i < k::NUM_PHI; i++)
   {
-    int ant1 = pueo::GeomTool::getAntFromPhiRing(i, ring1);
+    int ant1 = geom.getAntFromPhiRing(i, ring1);
 
 
-    int ant2 = pueo::GeomTool::getAntFromPhiRing(i, ring2);
+    int ant2 = geom.getAntFromPhiRing(i, ring2);
 
 
 //    printf("%d %d %d\n", pol, ant1,ant2);
@@ -400,11 +403,12 @@ int pueo::FilteredEvent::checkSaturation(std::bitset<k::NUM_ANTS> * save_hsat, s
   std::bitset<k::NUM_ANTS> hsat = 0; 
   std::bitset<k::NUM_ANTS> vsat = 0; 
 
+  auto geom = GeomTool::Instance(); 
   int totalsat = 0; 
   for (int i = 0; i < k::NUM_ANTS; i++) 
   {
-      int hindex = pueo::GeomTool::getChanIndexFromAntPol(i,pol::kHorizontal); 
-      int vindex = pueo::GeomTool::getChanIndexFromAntPol(i,pol::kVertical); 
+      int hindex = geom.getChanIndexFromAntPol(i,pol::kHorizontal); 
+      int vindex = geom.getChanIndexFromAntPol(i,pol::kVertical); 
       const double *yh = &useful->volts[hindex][0]; 
       const double *yv = &useful->volts[vindex][0]; 
 
@@ -437,14 +441,15 @@ int pueo::FilteredEvent::checkSaturation(std::bitset<k::NUM_ANTS> * save_hsat, s
 }
 
 int pueo::FilteredEvent::checkStepFunction(Int_t lab, ring::ring_t ring, Int_t phiSector, pol::pol_t pol)  const {
-  int ant0 = pueo::GeomTool::getAntFromPhiRing(phiSector, ring);
+  auto geom = GeomTool::Instance(); 
+  int ant0 = geom.getAntFromPhiRing(phiSector, ring);
   if(rawGraphsByAntPol[pol][ant0]->uneven()->pk2pk(0,0) < 1000) return 0;
 	for (int i = 0; i < k::NUM_PHI; i++)
   {
-    int ant1 = pueo::GeomTool::getAntFromPhiRing(i, ring::kBottomRing);
-    int ant2 = pueo::GeomTool::getAntFromPhiRing(i, ring::kLowerMiddleRing);
-    int ant3 = pueo::GeomTool::getAntFromPhiRing(i, ring::kUpperMiddleRing);
-    int ant4 = pueo::GeomTool::getAntFromPhiRing(i, ring::kTopRing);
+    int ant1 = geom.getAntFromPhiRing(i, ring::kBottomRing);
+    int ant2 = geom.getAntFromPhiRing(i, ring::kLowerMiddleRing);
+    int ant3 = geom.getAntFromPhiRing(i, ring::kUpperMiddleRing);
+    int ant4 = geom.getAntFromPhiRing(i, ring::kTopRing);
 
     double peak1 = rawGraphsByAntPol[pol][ant1]->uneven()->pk2pk(0,0);
     double peak2 = rawGraphsByAntPol[pol][ant2]->uneven()->pk2pk(0,0);
@@ -459,11 +464,12 @@ int pueo::FilteredEvent::checkStepFunction(Int_t lab, ring::ring_t ring, Int_t p
 }
 
 int pueo::FilteredEvent::checkSurfForGlitch(Int_t surf, Int_t lab, double glitchThreshold)  const {
+  auto geom = GeomTool::Instance(); 
 	for (int i = 0; i < k::NUM_DIGITZED_CHANNELS; i++)
   {
 		int ant;
 		pol::pol_t pol;
-		pueo::GeomTool::getAntPolFromSurfChan(surf, i, ant, pol);
+		geom.getAntPolFromSurfChan(surf, i, ant, pol);
 		double maxVal = abs(rawGraphsByAntPol[pol][ant]->uneven()->peakVal(0,0,-1,true));
 		double p2p = rawGraphsByAntPol[pol][ant]->uneven()->pk2pk();
 		double minVal = p2p - maxVal;

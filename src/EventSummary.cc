@@ -101,6 +101,7 @@ void pueo::EventSummary::zeroInternals(){
     nPeaks[polInd] = 0; 
     for(Int_t dir=0; dir < maxDirectionsPerPol; dir++)
     {
+      //FIXME: this may not be safe 
       memset(&peak[polInd][dir],0,sizeof(PointingHypothesis)); 
       memset(&coherent[polInd][dir],0,sizeof(WaveformInfo)); 
       memset(&deconvolved[polInd][dir],0,sizeof(WaveformInfo)); 
@@ -378,7 +379,7 @@ void pueo::EventSummary::setTriggerInfomation(const RawHeader* header){
   flags.isVPolTrigger = !!(header->trigType &  pueo::trigger::kVPol) ;
   flags.isHPolTrigger = !!(header->trigType &  pueo::trigger::kHPol) ;
 
-  flags.isRF = !!(header->trigType &  (pueo::trigger::kRFMI | pueo::trigger::kRFLF | pueo::trigger::kRFNadir)); 
+  flags.isRF = !!(header->trigType &  (pueo::trigger::kRFMI | pueo::trigger::kRFLF)); 
   flags.isSoftwareTrigger = !!(header->trigType & pueo::trigger::kSoft); 
   flags.isPPS0Trigger = !!(header->trigType & pueo::trigger::kPPS0) ; 
   flags.isPPS1Trigger = !!(header->trigType & pueo::trigger::kPPS1) ; 
@@ -749,7 +750,7 @@ double pueo::EventSummary::WaveformInfo::standardizedPeakMoment(int k) const {
  * Get the phi in degree of the current channel
  */
 double pueo::EventSummary::ChannelInfo::getPhi() const {
-  return GeomTool::getPhiFromAnt(ant);
+  return GeomTool::Instance().getPhiFromAnt(ant);
 }
 
 

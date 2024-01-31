@@ -16,6 +16,7 @@
 
 
 
+//FIXME, this needs to move to pueo-data 
 int pueo::ResponseManager::loadResponsesFromDir(const char * raw_dir, int npad, unsigned int evTime)
 {
   DIR *dp; 
@@ -274,13 +275,13 @@ int pueo::ResponseManager::loadResponsesFromDir(const char * raw_dir, int npad, 
       {
         the_ring = ring::kBottomRing; 
       }
-      else if (ring == 'N' || ring == 'n')
-      {
-        the_ring = ring::kNadirRing; 
-      }
+//      else if (ring == 'N' || ring == 'n')
+//      {
+//        the_ring = ring::kNadirRing; 
+//      }
       else if (ring == 'f' || ring == 'F')
       {
-        the_ring = ring::kLF; 
+        the_ring = ring::kLFTopRing;  //FIXME
       }
 
 

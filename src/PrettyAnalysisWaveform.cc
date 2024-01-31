@@ -5,7 +5,7 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-//FIXME this is not going to work yet until antenna numbers are revised... 
+//FIXME this is not going to work yet 
 
 #include "pueo/PrettyAnalysisWaveform.h"
 
@@ -348,8 +348,9 @@ int pueo::PrettyAnalysisWaveform::getMaxAntennaVSquared(pol::pol_t pol, Double_t
    //Could consider changng this to make things better
    double maxVal=0;
    int maxAnt=0;
-   for(int ant=0;ant<32;ant++) {
-      int chanIndex=GeomTool::getChanIndexFromAntPol(ant,pol);
+   auto geom = GeomTool::Instance(); 
+   for(int ant=0;ant<32;ant++) {//FIXME
+      int chanIndex=geom.getChanIndexFromAntPol(ant,pol);
       Double_t rmsChan=TMath::RMS(useful->volts[chanIndex].size(),&useful->volts[chanIndex][0]);
       for(int samp=0;samp<useful->volts[chanIndex].size();samp++) {
         double vSquared=useful->volts[chanIndex][samp]*useful->volts[chanIndex][samp];
@@ -405,12 +406,13 @@ int pueo::PrettyAnalysisWaveform::getMaxAntennaCorrelationRollingAvg(pol::pol_t 
    int maxAnt=0;
    double maxVals[16]={0};
    int otherAnt = -1,ciTop = -1; 
+   auto geom = GeomTool::Instance(); 
    for(int ant=0;ant<16;ant++) {
       //Loop over the top antennas
 //FIXME      int otherAnt=GeomTool::getAzimuthPartner(ant);
 //FIXME      int ciTop=GeomTool::getChanIndexFromAntPol(ant,pol);
-      int ciMiddle=GeomTool::getChanIndexFromAntPol(otherAnt,pol);
-      int ciBottom=GeomTool::getChanIndexFromAntPol(otherAnt+16,pol);
+      int ciMiddle=geom.getChanIndexFromAntPol(otherAnt,pol);
+      int ciBottom=geom.getChanIndexFromAntPol(otherAnt+16,pol);
 
       AnalysisWaveform* wfCor1 = getCorrelation(ciTop,ciMiddle);      
       TGraph* grCor1 = (TGraph*) wfCor1->even();
@@ -448,9 +450,9 @@ int pueo::PrettyAnalysisWaveform::getMaxAntennaCorrelationRollingAvg(pol::pol_t 
 
 
      int otherAnt=-1; //FIXME GeomTool::getAzimuthPartner(ant); 
-     int ciTop=GeomTool::getChanIndexFromAntPol(ant,pol);
-     int ciMiddle=GeomTool::getChanIndexFromAntPol(otherAnt,pol);
-     int ciBottom=GeomTool::getChanIndexFromAntPol(otherAnt+16,pol);
+     int ciTop=geom.getChanIndexFromAntPol(ant,pol);
+     int ciMiddle=geom.getChanIndexFromAntPol(otherAnt,pol);
+     int ciBottom=geom.getChanIndexFromAntPol(otherAnt+16,pol);
      
      Double_t newVal=maxVals[leftAnt]+maxVals[ant]+maxVals[rightAnt];
 
@@ -635,12 +637,13 @@ pueo::CorrelationSummary* pueo::PrettyAnalysisWaveform::getCorrelationSummary(In
    theSum->firstAnt[51]  = nineAnts[6];
    theSum->secondAnt[51] = nineAnts[8];
    
+   auto geom = GeomTool::Instance(); 
 
    //Now can make correlations and find max, rms, etc.
    for(int corInd=0;corInd<NUM_CORRELATIONS_ANITA4;corInd++) {
       //      std::cout << corInd << "\t" << theSum->firstAnt[corInd] << "\t" << theSum->secondAnt[corInd] << "\n";
-      Int_t ci1=GeomTool::getChanIndexFromAntPol(theSum->firstAnt[corInd],pol);
-      Int_t ci2=GeomTool::getChanIndexFromAntPol(theSum->secondAnt[corInd],pol);
+      Int_t ci1=geom.getChanIndexFromAntPol(theSum->firstAnt[corInd],pol);
+      Int_t ci2=geom.getChanIndexFromAntPol(theSum->secondAnt[corInd],pol);
       //      std::cout << corInd << "\t"<< ci1 << " " << ci2 << "  " << theSum->firstAnt[corInd] << "\t" << theSum->secondAnt[corInd] <<std::endl;
 
 //       if (ci1*ci2<0) continue; // Linda added this condition

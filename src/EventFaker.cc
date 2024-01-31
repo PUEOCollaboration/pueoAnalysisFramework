@@ -118,23 +118,24 @@ void pueo::EventFaker::addSignal(pueo::UsefulEvent * event, double theta, double
   double th_rad = theta * TMath::DegToRad(); 
   double phi_rad = phi * TMath::DegToRad(); 
 
+  auto geom = GeomTool::Instance(); 
 
   for (int ich = 0; ich < k::NUM_DIGITZED_CHANNELS; ich++)
   {
     int chan, surf; 
-    pueo::GeomTool::getSurfChanFromChanIndex(ich, surf, chan); 
+    geom.getSurfChanFromChanIndex(ich, surf, chan); 
     if (chan == 8) continue; //this is the clock, ignore it; 
     int ant; 
     pueo::pol::pol_t pol ; 
-    pueo::GeomTool::getAntPolFromSurfChan(surf,chan, ant, pol); 
+    geom.getAntPolFromSurfChan(surf,chan, ant, pol); 
     double sig_t0 = signal[ant][pol].even()->GetX()[0]; 
     double sig_t1 = signal[ant][pol].even()->GetX()[signal[ant][pol].Neven()-1]; 
 
     //we need to figure out the gain and delay for this channel 
     
-    double R = pueo::GeomTool::Instance().getAntR(ant, pol); 
-    double z = pueo::GeomTool::Instance().getAntZ(ant, pol); 
-    double phi0_rad =  pueo::GeomTool::Instance().getAntPhiPositionRelToAftFore(ant,pol); 
+    double R = geom.getAntR(ant, pol); 
+    double z = geom.getAntZ(ant, pol); 
+    double phi0_rad =  geom.getAntPhiPositionRelToAftFore(ant,pol); 
     double phi0=  phi0_rad  * TMath::RadToDeg(); 
     double Greal = A * (pol == pueo::pol::kHorizontal ?  offAxisGain_hpol :  offAxisGain_vpol).Eval(phi-phi0, theta-10); //TODO: don't hardcode 10 
     std::complex<double> G = Greal * (pol == pueo::pol::kHorizontal ? jones_H : jones_V); 
@@ -143,7 +144,7 @@ void pueo::EventFaker::addSignal(pueo::UsefulEvent * event, double theta, double
     ts+= offAxisDelay.Eval( phi-phi0, theta-10); 
     ts += extra_delay; 
 
-    for (auto i = 0; i < event->volts[ich].size(); i++) 
+    for (size_t i = 0; i < event->volts[ich].size(); i++) 
     {
 
       if (event->t(ich,i) - ts< sig_t0) continue; 
