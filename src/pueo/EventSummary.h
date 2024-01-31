@@ -63,31 +63,31 @@ class EventSummary : public TObject
   {
    public:
     PointingHypothesis() : fContainer(NULL) { ; }
-    Double_t phi;  /// peak phi, degrees
-    Double_t theta; /// peak theta, degrees
-    Double_t value; /// peak value
-    Double_t snr; /// snr of peak
-    Double_t mapRMS; /// rms of interferometric map
-    Double_t mapHistoryVal; /// value of average of the peak location over the past 60 min-bias events
-    Double_t hwAngle; /// angle with respect to triggering phi sector
-    Double_t hwAngleXPol; /// angle with respect to triggering phi sector in opposite polarisation
-    Double_t latitude;/// on continent, or -9999 if doesn't intersect
-    Double_t longitude;/// on continent, or -9999 if doesn't intersect
-    Double_t altitude;/// on continent, or -9999 if doesn't intersect
-    Double_t distanceToSource; /// on continent, or -9999 if doesn't intersect
-    Double_t sigma_theta;  /// error on theta
-    Double_t sigma_phi;  /// error on phi
-    Double_t rho;  /// correlation coefficient between theta and phi
-    Double_t chisq; /// chisq/ndof of peak finding process, if available (otherwise zero)
-    Double_t theta_adjustment_needed; /// If an event barely missed the ground, it is useful to see the coordinates at which it would hit if theta adjustment by a small amount. This is the calculated small amount that leads to it hitting the ground.
-    Double_t phi_separation; /// angular separation from higher value peak in same event. 1000 if highest value event (i.e. first hypothesis)
-    Double_t dphi_rough;  /// phi - phi rough
-    Double_t dtheta_rough; /// theta - theta rough
-    Bool_t triggered; /// was this in a triggered phi sector?
-    Bool_t triggered_xpol; /// was this in a triggered xpol phi sector?
-    Bool_t masked; /// was this in a masked phi sector?
-    Bool_t masked_xpol; /// was this in a masked phi xpol sector?
-    Double_t antennaPeakAverage; /// the average of channel peaks in this direction 
+    Double_t phi = 0;  /// peak phi, degrees
+    Double_t theta = 0; /// peak theta, degrees
+    Double_t value = 0; /// peak value
+    Double_t snr = 0; /// snr of peak
+    Double_t mapRMS = 0; /// rms of interferometric map
+    Double_t mapHistoryVal = 0; /// value of average of the peak location over the past 60 min-bias events
+    Double_t hwAngle = 0; /// angle with respect to triggering phi sector
+    Double_t hwAngleXPol = 0; /// angle with respect to triggering phi sector in opposite polarisation
+    Double_t latitude = 0;/// on continent, or -9999 if doesn't intersect
+    Double_t longitude = 0;/// on continent, or -9999 if doesn't intersect
+    Double_t altitude = 0;/// on continent, or -9999 if doesn't intersect
+    Double_t distanceToSource = 0; /// on continent, or -9999 if doesn't intersect
+    Double_t sigma_theta = 0;  /// error on theta
+    Double_t sigma_phi = 0;  /// error on phi
+    Double_t rho = 0;  /// correlation coefficient between theta and phi
+    Double_t chisq = 0; /// chisq/ndof of peak finding process, if available (otherwise zero)
+    Double_t theta_adjustment_needed = 0; /// If an event barely missed the ground, it is useful to see the coordinates at which it would hit if theta adjustment by a small amount. This is the calculated small amount that leads to it hitting the ground.
+    Double_t phi_separation = 0; /// angular separation from higher value peak in same event. 1000 if highest value event (i.e. first hypothesis)
+    Double_t dphi_rough = 0;  /// phi - phi rough
+    Double_t dtheta_rough = 0; /// theta - theta rough
+    Bool_t triggered = 0; /// was this in a triggered phi sector?
+    Bool_t triggered_xpol = 0; /// was this in a triggered xpol phi sector?
+    Bool_t masked = 0; /// was this in a masked phi sector?
+    Bool_t masked_xpol = 0; /// was this in a masked phi xpol sector?
+    Double_t antennaPeakAverage = 0; /// the average of channel peaks in this direction 
 
     // Most basic resolution utility functions in payload coordinates relative to ADU5-aft-fore line
     Double_t dPhi(Double_t phi) const;
@@ -126,7 +126,7 @@ class EventSummary : public TObject
     // The //! comment after the fContainer member means it does not persist in ROOT.
     // Please do not edit that comment.
     //----------------------------------------------------------------------------------------------------
-    mutable EventSummary* fContainer; //! WARNING! Does not persist! Get access to EventSummary that contains this PointingHypothesis
+    mutable EventSummary* fContainer = nullptr; //! WARNING! Does not persist! Get access to EventSummary that contains this PointingHypothesis
     const EventSummary* getContainer(const char* funcName) const; /// Wraps getting fContainer with a warning if NULL.
     Double_t dPhiSource(const SourceHypothesis& source) const;   // Won't work inside TTree::Draw due to limitations in TTreeFormula, so are private, use e.g. dPhiWais() instead.
     Double_t dThetaSource(const SourceHypothesis& source, bool different_sign_conventions = true) const; // Won't work inside TTree::Draw due to limitations in TTreeFormula, so are private, use e.g. dThetaWais() instead.
@@ -222,7 +222,7 @@ class EventSummary : public TObject
     Double_t snrHilbert;  // average value from hilbert peak-5sec to peak + 10 sec / (average of 10 secs at beginning of nonzero portion of hilbert env)
     //End BinnedAnalysis changes
 
-    ClassDefNV(WaveformInfo, 19);  //Incremented up to 19 per the advice of Cosmin. - JCF 9/27/2021
+    ClassDefNV(WaveformInfo, 1);  //Incremented up to 19 per the advice of Cosmin.
 
    private:
     friend class EventSummary;
