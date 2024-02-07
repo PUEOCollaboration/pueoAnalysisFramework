@@ -1,0 +1,7 @@
+- Remove or port examples and macros
+- Implement ResponseManager (once pueo-data has responses) 
+- Fix PrettyPueoWaveform (or remove) for PUEO 
+- Fix BandwidthMeasure ANITA dependencies
+- Update EventSummary definitions
+- Fix ring power calculations in FilteredEvent (or remove) 
+
