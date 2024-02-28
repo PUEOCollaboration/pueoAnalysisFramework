@@ -59,8 +59,7 @@ namespace bandwidth
 
 
   /** This stuff is all used by the various metrics, not actually useful for anything else */
-  void checkNotches(int timeCheck, double& notch0, double& notch1, double& notch2);
-  double fillPowers(const TGraphAligned* powd, std::vector<double> &powers, double notch0, double notch1, double notch2);
+  double fillPowers(const TGraphAligned* powd, std::vector<double> &powers); 
   TGraph* loadImpulsePower(int timeCheck);
   void normalizePower(TGraph* g);
   TGraph* downsampleImpulse(TGraph* imp, const TGraphAligned* examp);

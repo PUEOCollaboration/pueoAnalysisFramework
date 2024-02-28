@@ -13,11 +13,8 @@ double pueo::bandwidth::bandwidthMeasure(const AnalysisWaveform* wf, int timeChe
 {
   const pueo::TGraphAligned* gPow = wf->power();
   std::vector<double> powers;
-  double notch0, notch1, notch2;
-  notch0=0; notch1=0; notch2=0;
-  pueo::bandwidth::checkNotches(timeCheck, notch0, notch1, notch2);
 
-  double norm = pueo::bandwidth::fillPowers(gPow, powers, notch0, notch1, notch2);
+  double norm = pueo::bandwidth::fillPowers(gPow, powers);
   int N = powers.size();
   std::sort(powers.begin(), powers.end());
 
@@ -101,10 +98,8 @@ double pueo::bandwidth::hooverIndex(const AnalysisWaveform * wf, int timeCheck)
 {
   const TGraphAligned* gPow = wf->power();
   std::vector<double> powers;
-  double notch0, notch1, notch2;
-  pueo::bandwidth::checkNotches(timeCheck, notch0, notch1, notch2);
 
-  double norm = pueo::bandwidth::fillPowers(gPow, powers, notch0, notch1, notch2);
+  double norm = pueo::bandwidth::fillPowers(gPow, powers); 
   int N = powers.size();
   double meanVal = norm/double(N);
 
@@ -119,10 +114,8 @@ double pueo::bandwidth::theilIndex(const AnalysisWaveform * wf, int timeCheck)
 {
   const TGraphAligned* gPow = wf->power();
   std::vector<double> powers;
-  double notch0, notch1, notch2;
-  pueo::bandwidth::checkNotches(timeCheck, notch0, notch1, notch2);
 
-  double norm = pueo::bandwidth::fillPowers(gPow, powers, notch0, notch1, notch2);
+  double norm = pueo::bandwidth::fillPowers(gPow, powers); 
   int N = powers.size();
   double meanVal = norm/double(N);
 
@@ -187,7 +180,7 @@ void pueo::bandwidth::normalizePower(TGraph* g)
   return;
 }
 
-double pueo::bandwidth::fillPowers(const TGraphAligned* powdb, std::vector<double> &powers, double notch0, double notch1, double notch2)
+double pueo::bandwidth::fillPowers(const TGraphAligned* powdb, std::vector<double> &powers)
 {
   double norm = 0;
   int skip = 0;
