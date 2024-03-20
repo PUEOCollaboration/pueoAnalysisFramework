@@ -275,6 +275,7 @@ Double_t pueo::TGraphAligned::getSumV2(Int_t istart, Int_t iend) const
   aligned_double_v v = GetY(); 
   __builtin_prefetch(v);  // This is really an academic exercise at this point
   int N = GetN();  
+  if (!N) return 0; 
   int real_start = istart >= 0 ? TMath::Min(istart, N-1) : TMath::Max(0, N + istart)  ; 
   int real_end = iend >= 0 ? TMath::Min(iend, N-1) : TMath::Max(0, N + iend)  ; 
 
