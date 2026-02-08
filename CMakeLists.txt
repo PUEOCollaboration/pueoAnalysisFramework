@@ -6,7 +6,24 @@ add_library(${PROJECT_NAME} SHARED)
 find_package(ROOT CONFIG REQUIRED COMPONENTS TreePlayer)
 find_package(AntarcticaRoot CONFIG REQUIRED) # this "transitively" fetches RootFftwWrapper
 find_package(pueoEvent CONFIG REQUIRED)
-include(GNUInstallDirs)
+find_package(OpenMP)
+## todo, OpenMP can probably also come from RootFftwWrapper but not sure how much that simplifies things.
+#  in the meantime, references:
+#    1) https://cmake.org/cmake/help/latest/module/FindOpenMP.html#result-variables
+#    2) https://cliutils.gitlab.io/modern-cmake/chapters/packages/OpenMP.html
+if(OpenMP_CXX_FOUND)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE USE_OMP)
+  target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
+else()
+  message(STATUS "OpenMP not found, compiling without it.")
+endif()
+
+## Change Log Feb 8, 2026
+#  The option "VECTORIZE" is removed.
+#  The relevant additional include path and linking should come from the upstream package RootFftwWrapper.
+#  There, the option is on by default (although pueoBuilder turns this off automatically for arm64 platforms).
+#  That is, the compiler flag "-DENABLE_VECTORIZE" is public and will propagate from RootFftwWrapper 
+#  to this project; the include path and linkage also comes from there.
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelwithDebugInfo CACHE STRING "" FORCE)
@@ -14,6 +31,7 @@ if(NOT CMAKE_BUILD_TYPE)
   target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:RelWithDebInfo>:-Wall -Wextra -Wno-unused-function>)
 endif()
 
+include(GNUInstallDirs)
 add_subdirectory(src) # this calls src/CMakeLists.txt to add cpp and header files
 
 target_link_libraries(${PROJECT_NAME} 
@@ -65,48 +83,6 @@ install(
 #
 # endif()
 
-
-## todo, this can come from RootFftwWrapper
-# option(VECTORIZE "Enable Manual SIMD Vectorization" ON) 
-# set (VECTORDIR ${UTIL_INC_DIR}/vectorclass)
-# if (VECTORIZE)
-#   add_definitions( -DENABLE_VECTORIZE )
-#
-#   if(CMAKE_COMPILER_IS_GNUCXX)
-#
-#     ### someone should do this for clang if they want it to be as fast as possible
-#     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.1)
-#       if(NATIVE_ARCH) #define in anitaBuildTool, default on
-# 	add_definitions( -march=native)
-#       endif()
-#     endif()
-#     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
-#       # Vectorize docs...
-#       # If you are using the Gnu compiler version 3.x or 4.x then you must
-#       # set the ABI version to 4 or more, or 0 for a reasonable default
-#       add_definitions(-fabi-version=0)
-#     endif()
-#   endif()
-#
-#   #  message(${VECTORDIR})
-#   include_directories(${VECTORDIR}) 
-# endif (VECTORIZE)
-
-
-## todo, this can once again come from RootFftwWrapper
-# option( ENABLE_OPENMP "Enable OpenMP support")
-# if(ENABLE_OPENMP)
-#   FIND_PACKAGE( OpenMP REQUIRED)
-#   if(OPENMP_FOUND)
-#     message("OPENMP FOUND")
-#     add_definitions (-DUSE_OMP)
-#     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-#     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-#   else()
-#     message(FATAL_ERROR "you tried to use openmp but Cmake couldn't find compiler support")
-#   endif()
-# endif()
 
 ## todo, add this back if it's still needed
 # option( PUEO_ANALYSIS_DEBUG "Enable some debug options that probably slow things down " )
