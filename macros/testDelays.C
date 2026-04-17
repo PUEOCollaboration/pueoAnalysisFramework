@@ -12,11 +12,11 @@ int testDelays (int ndelays = 9, double min = -2, double max = 2,double Hamp = 1
 
 //  imp->Draw(); 
 
-  AnalysisWaveform up( imp->GetN(), imp->GetY(), 1./2.6, 0); 
+  pueo::AnalysisWaveform up( imp->GetN(), imp->GetY(), 1./2.6, 0); 
   up.padFreq(10); 
 
-  AnalysisWaveform * H= new AnalysisWaveform(250,0.1,0); 
-  TGraphAligned * g = H->updateEven(); 
+  pueo::AnalysisWaveform * H= new pueo::AnalysisWaveform(250,0.1,0); 
+  pueo::TGraphAligned * g = H->updateEven(); 
   up.evalEven(g->GetN(), g->GetX(), g->GetY()); 
   for (int i = 0; i < g->GetN();i++) g->GetY()[i] *= Hamp; 
 
@@ -38,7 +38,7 @@ int testDelays (int ndelays = 9, double min = -2, double max = 2,double Hamp = 1
     plotH->GetXaxis()->SetTitle("ns"); 
     plotH->GetYaxis()->SetTitle("A"); 
 
-    AnalysisWaveform * V= new AnalysisWaveform(250,0.1,0); 
+    pueo::AnalysisWaveform * V= new pueo::AnalysisWaveform(250,0.1,0); 
     g = V->updateEven(); 
     for (int i = 0; i < g->GetN(); i++) 
     {
@@ -49,7 +49,7 @@ int testDelays (int ndelays = 9, double min = -2, double max = 2,double Hamp = 1
     c1->cd(idelay +1); 
     plotH->Draw("al"); 
     V->drawEven("same"); 
-    polarimetry::StokesAnalysis*  stokes = new polarimetry::StokesAnalysis(H,V,xcorr,0); 
+    pueo::polarimetry::StokesAnalysis*  stokes = new pueo::polarimetry::StokesAnalysis(H,V,xcorr,0); 
     c2->cd(idelay+1); 
     double windowed_I, windowed_U, windowed_Q, windowed_V; 
     stokes->computeWindowedAverage(0.25,&windowed_I,&windowed_Q,&windowed_U,&windowed_V); 
