@@ -10,7 +10,7 @@
 #include "TStyle.h"
 
 // maybe this should be configurable? :) 
-static const int pad_to_size = pueo::k::MAX_NUMBER_SAMPLES; 
+static const int pad_to_size = pueo::k::NUM_SAMPLES; 
 
 //ClassImp(pueo::FilteredEvent);
 
@@ -466,7 +466,7 @@ int pueo::FilteredEvent::checkStepFunction(Int_t lab, ring::ring_t ring, Int_t p
 
 int pueo::FilteredEvent::checkSurfForGlitch(Int_t surf, Int_t lab, double glitchThreshold)  const {
   auto geom = GeomTool::Instance(); 
-	for (int i = 0; i < k::NUM_DIGITZED_CHANNELS; i++)
+	for (int i = 0; i < k::NUM_DIGITIZED_CHANNELS; i++)
   {
 		int ant;
 		pol::pol_t pol;

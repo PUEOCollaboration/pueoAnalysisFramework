@@ -102,11 +102,11 @@ void pueo::NoiseMonitor::makeProfiles(int run){
 
   d.first();
   header = d.header();
-  double startTime = header->realTime;
+  double startTime = header->triggerTime;
 
   d.last();
   header = d.header();
-  double endTime = header->realTime + 1; // make sure last event is in bin
+  double endTime = header->triggerTime + 1; // make sure last event is in bin
 
   const int nBin = (endTime - startTime)/double(defaultTimeScaleSeconds);
 
@@ -147,7 +147,7 @@ void pueo::NoiseMonitor::makeProfiles(int run){
           const AnalysisWaveform* wf = fEv.getFilteredGraph(ant, pol);
           const TGraphAligned* gr = wf->even();
           double rms = TMath::RMS(gr->GetN(), gr->GetY());
-          profs.at(pol)->Fill(ant, header->realTime, rms);
+          profs.at(pol)->Fill(ant, header->triggerTime, rms);
         }
       }
     }

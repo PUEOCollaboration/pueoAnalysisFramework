@@ -63,10 +63,10 @@ pueo::AnalysisWaveform* pueo::PrettyAnalysisWaveform::getCorrelation(int chanInd
 
 pueo::AnalysisWaveform *pueo::PrettyAnalysisWaveform::getCorrelationInterpolated(int chanIndex1, int chanIndex2, pol::pol_t pol,  Int_t npadfreq) 
 {
-  if(chanIndex1 <0 || chanIndex1>(k::NUM_DIGITZED_CHANNELS-1))
+  if(chanIndex1 <0 || chanIndex1>(k::NUM_DIGITIZED_CHANNELS-1))
     std::cerr << "Invalid channel index:\t" << chanIndex1 << "\n";
 
-  if(chanIndex2 <0 || chanIndex2>(k::NUM_DIGITZED_CHANNELS-1))
+  if(chanIndex2 <0 || chanIndex2>(k::NUM_DIGITIZED_CHANNELS-1))
     std::cerr << "Invalid channel index:\t" << chanIndex2 << "\n";
 		
 	 const AnalysisWaveform* wf1 = getFilteredGraph(chanIndex1, pol);
@@ -754,7 +754,7 @@ pueo::CorrelationSummary* pueo::PrettyAnalysisWaveform::getCorrelationSummary(In
    // The better way is just use adu5 and get expected Wais theta and phi.
   Double_t phiWave,thetaWave;
   UsefulAttitude* usefulPat = new UsefulAttitude(fPat);
-  usefulPat->getThetaAndPhiWave(Locations::getWaisLongitude(), Locations::getWaisLatitude(), Locations::getWaisAltitude(), thetaWave, phiWave);
+  usefulPat->getThetaAndPhiWave(Locations::getLongitude(Locations::WAIS), Locations::getLatitude(Locations::WAIS), Locations::getAltitude(Locations::WAIS), thetaWave, phiWave);
   theSum->thetaWave = thetaWave;
   theSum->phiWave = phiWave;
 

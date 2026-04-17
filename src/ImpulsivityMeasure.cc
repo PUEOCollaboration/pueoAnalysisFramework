@@ -1,5 +1,6 @@
 #include "pueo/ImpulsivityMeasure.h" 
 #include "pueo/AnalysisWaveform.h" 
+#include "TMath.h"
 #include "TH2.h" 
 #include <algorithm> 
 #include <cmath>

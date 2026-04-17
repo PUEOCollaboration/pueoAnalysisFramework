@@ -718,12 +718,12 @@ TVector3 pueo::UsefulAttitude::getUnitVectorAlongThetaWavePhiWave(double thetaWa
 
 void pueo::UsefulAttitude::getThetaAndPhiWaveWaisDivide(Double_t &thetaWave, Double_t &phiWave)
 {  
-  return getThetaAndPhiWave(Locations::getWaisLongitude(), Locations::getWaisLatitude(),Locations::getWaisAltitude(),thetaWave,phiWave);
+  return getThetaAndPhiWave(Locations::getLongitude(Locations::WAIS), Locations::getLatitude(Locations::WAIS),Locations::getAltitude(Locations::WAIS),thetaWave,phiWave);
 }
 
 void pueo::UsefulAttitude::getThetaAndPhiWaveLDB(Double_t &thetaWave, Double_t &phiWave)
 {
-  return getThetaAndPhiWave(Locations::getLDBLongitude(), Locations::getLDBLatitude(),Locations::getLDBAltitude(),thetaWave,phiWave);
+  return getThetaAndPhiWave(Locations::getLongitude(Locations::LDB), Locations::getLatitude(Locations::LDB),Locations::getAltitude(Locations::LDB),thetaWave,phiWave);
 }
 
 
@@ -982,18 +982,18 @@ Double_t pueo::UsefulAttitude::getDeltaTExpectedSeaveyOpt(Int_t ant1, Int_t ant2
 
 UInt_t pueo::UsefulAttitude::getWaisDivideTriggerTimeNs() const
 {
-  return getTriggerTimeNsFromSource(Locations::getWaisLatitude(),
-				    Locations::getWaisLongitude(),
-				    Locations::getWaisAltitude());
+  return getTriggerTimeNsFromSource(Locations::getLatitude(Locations::WAIS),
+				    Locations::getLongitude(Locations::WAIS),
+				    Locations::getAltitude(Locations::WAIS));
 }
 
 
 
 UInt_t pueo::UsefulAttitude::getLDBTriggerTimeNs() const
 {
-  return getTriggerTimeNsFromSource(Locations::getLDBLongitude(),
-				    Locations::getLDBLatitude(),
-				    Locations::getLDBAltitude());
+  return getTriggerTimeNsFromSource(Locations::getLongitude(Locations::LDB),
+				    Locations::getLatitude(Locations::LDB),
+				    Locations::getAltitude(Locations::LDB));
 }
 
 
@@ -1477,7 +1477,7 @@ int pueo::UsefulAttitude::astronomicalCoordinates(Double_t phiWave, Double_t the
   double h  = atan2 ( sin(Az) , -cos(Az)* sin(lat)  + tan(el) * cos(lat));
 
 //  printf("%f\n", h * 12 / M_PI);
-  TTimeStamp ts ( (time_t) realTime, (timeOfDay % 1000)  * 1e6);
+  TTimeStamp ts ( (time_t) realTime, realTimeNsecs);
 
   //should this be AsLAST or AsLMST? Need to find a real astronomer
   // Also, the UT1 offset seems like a royal pain
@@ -1562,7 +1562,7 @@ int pueo::UsefulAttitude::fromRADec(int N, const Double_t * RA, const Double_t *
   return 0;
 #else
 
-  TTimeStamp ts ( (time_t) realTime, (timeOfDay % 1000)  * 1e6);
+  TTimeStamp ts ( (time_t) realTime, realTimeNsecs);
 
   //should this be AsLAST or AsLMST? Need to find a real astronomer
   // Also, the UT1 offset seems like a royal pain
@@ -1653,7 +1653,7 @@ int pueo::UsefulAttitude::fromRADec(Double_t RA, Double_t dec, Double_t * phi, D
   return 0;
 #else
 
-  TTimeStamp ts ( (time_t) realTime, (timeOfDay % 1000)  * 1e6);
+  TTimeStamp ts ( (time_t) realTime, realTimeNsecs);
 
   //should this be AsLAST or AsLMST? Need to find a real astronomer
   // Also, the UT1 offset seems like a royal pain
