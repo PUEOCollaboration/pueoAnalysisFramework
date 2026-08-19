@@ -48,6 +48,7 @@ install(
   TARGETS ${PROJECT_NAME} # just one target, ie this library, for now
   EXPORT ${PROJECT_NAME}Targets # put all targets listed above with this particular "export"
   FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # install the header files of the target
+  LIBRARY DESTINATION lib
 )
 
 install(
