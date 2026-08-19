@@ -34,7 +34,7 @@ set(HEADER_FILES
   # pueo/DiodeFilter.h
   # pueo/EventFaker.h
   # pueo/EventReconstructor.h
-  # pueo/EventSummary.h
+  pueo/EventSummary.h
   # pueo/FilterOperation.h
   # pueo/FilterStrategy.h
   # pueo/FilteredEvent.h
@@ -46,7 +46,6 @@ set(HEADER_FILES
   # pueo/NoiseSummary.h
   # pueo/Polarimetry.h
   # pueo/PrettyAnalysisWaveform.h
-  pueo/PueoEventSummary.h
   # pueo/ResponseManager.h
   # pueo/SensitivityCalculator.h
   # pueo/SystemResponse.h

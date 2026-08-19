@@ -6,23 +6,15 @@
 
 #pragma link C++ namespace pueo; 
 
-#pragma link C++ class PueoEventSummary+;
-#pragma link C++ class PueoEventSummary::PointingHypothesis+;
-#pragma link C++ class PueoEventSummary::WaveformInfo+;
-#pragma link C++ class PueoEventSummary::ChannelInfo+;
-#pragma link C++ class PueoEventSummary::EventFlags+;
-#pragma link C++ class PueoEventSummary::SourceHypothesis+;
-#pragma link C++ class PueoEventSummary::PayloadLocation+;
-
 // #pragma link C++ class pueo::EventReconstructor+;
-// #pragma link C++ class pueo::EventSummary+;
-// #pragma link C++ class pueo::EventSummary::PointingHypothesis+;
-// #pragma link C++ class pueo::EventSummary::WaveformInfo+;
-// #pragma link C++ class pueo::EventSummary::ChannelInfo+;
-// #pragma link C++ class pueo::EventSummary::EventFlags+;
-// #pragma link C++ class pueo::EventSummary::SourceHypothesis+;
+#pragma link C++ class pueo::EventSummary+;
+#pragma link C++ class pueo::EventSummary::PointingHypothesis+;
+#pragma link C++ class pueo::EventSummary::WaveformInfo+;
+#pragma link C++ class pueo::EventSummary::ChannelInfo+;
+#pragma link C++ class pueo::EventSummary::EventFlags+;
+#pragma link C++ class pueo::EventSummary::SourceHypothesis+;
 // #pragma link C++ class pueo::EventSummary::MCTruth+;
-// #pragma link C++ class pueo::EventSummary::PayloadLocation+;
+#pragma link C++ class pueo::EventSummary::PayloadLocation+;
 // #pragma link C++ class pueo::FilteredEvent+;
 // #pragma link C++ class pueo::FilterStrategy+;
 // #pragma link C++ class pueo::AnalysisWaveform+;
