@@ -52,7 +52,7 @@ void pueo::EventSummary::useProbWeight(int use)
   setTriggerInfomation(header);
   eventNumber = header->eventNumber;
   run = header->run;
-  realTime = header->realTime;
+  realTime = header->triggerTime;
 
 }
 
@@ -75,7 +75,7 @@ void pueo::EventSummary::useProbWeight(int use)
   setSourceInformation(pat,truth);
   eventNumber = header->eventNumber;
   run = header->run;
-  realTime = header->realTime;
+  realTime = header->triggerTime;
 }
 
 

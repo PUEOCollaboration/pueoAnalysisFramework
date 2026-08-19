@@ -120,7 +120,7 @@ void pueo::EventFaker::addSignal(pueo::UsefulEvent * event, double theta, double
 
   auto geom = GeomTool::Instance(); 
 
-  for (int ich = 0; ich < k::NUM_DIGITZED_CHANNELS; ich++)
+  for (int ich = 0; ich < k::NUM_DIGITIZED_CHANNELS; ich++)
   {
     int chan, surf; 
     geom.getSurfChanFromChanIndex(ich, surf, chan); 
