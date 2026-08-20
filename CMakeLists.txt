@@ -9,7 +9,7 @@ target_sources(${PROJECT_NAME} PRIVATE
   # src/CorrelationSummary.cc
   # src/DiodeFilter.cc
   # src/EventFaker.cc
-  # src/EventSummary.cc
+  src/EventSummary.cc
   # src/FilterOperation.cc
   # src/FilterStrategy.cc
   # src/FilteredEvent.cc
