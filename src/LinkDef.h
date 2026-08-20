@@ -13,14 +13,14 @@
 #pragma link C++ class pueo::EventSummary::ChannelInfo+;
 #pragma link C++ class pueo::EventSummary::EventFlags+;
 #pragma link C++ class pueo::EventSummary::SourceHypothesis+;
-// #pragma link C++ class pueo::EventSummary::MCTruth+;
+#pragma link C++ class pueo::EventSummary::MCTruth+;
 #pragma link C++ class pueo::EventSummary::PayloadLocation+;
 // #pragma link C++ class pueo::FilteredEvent+;
 // #pragma link C++ class pueo::FilterStrategy+;
 // #pragma link C++ class pueo::AnalysisWaveform+;
 // #pragma link C++ class pueo::AnalysisWaveform::PowerCalculationOptions;
 // #pragma link C++ class pueo::PrettyAnalysisWaveform+;
-#pragma link C++ class pueo::TGraphAligned+;
+// #pragma link C++ class pueo::TGraphAligned+;
 //
 // #pragma link C++ class pueo::TemplateSummary+;
 // #pragma link C++ class pueo::TemplateSummary::SingleTemplateResult+;

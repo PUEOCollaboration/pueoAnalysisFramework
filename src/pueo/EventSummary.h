@@ -322,7 +322,8 @@ class EventSummary : public TObject
 
     Int_t isGood;
     Int_t isRF;
-    Int_t isPPSTrigger; // pueoTALON: cmobine PPS0 PPS1
+    Int_t isPPS0Trigger; // pueoTALON calls this isPPSTrigger
+    Int_t isPPS1Trigger; // not used, see pueo/Convention.h
     Int_t isSoftwareTrigger;
     Int_t isMinBiasTrigger;
     Int_t isPayloadBlast;

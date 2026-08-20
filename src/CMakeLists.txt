@@ -5,7 +5,7 @@ target_sources(${PROJECT_NAME} PRIVATE
   # CorrelationSummary.cc
   # DiodeFilter.cc
   # EventFaker.cc
-  # EventSummary.cc
+  EventSummary.cc
   # FilterOperation.cc
   # FilterStrategy.cc
   # FilteredEvent.cc
@@ -20,7 +20,7 @@ target_sources(${PROJECT_NAME} PRIVATE
   # ResponseManager.cc
   # SensitivityCalculator.cc
   # SystemResponse.cc
-  TGraphAligned.cc
+  # TGraphAligned.cc
   # TMVA.cc
   # TaperFilter.cc
   # Templates.cc
@@ -49,7 +49,7 @@ set(HEADER_FILES
   # pueo/ResponseManager.h
   # pueo/SensitivityCalculator.h
   # pueo/SystemResponse.h
-  pueo/TGraphAligned.h
+  # pueo/TGraphAligned.h
   # pueo/TMVA.h
   # pueo/TaperFilter.h
   # pueo/Templates.h
