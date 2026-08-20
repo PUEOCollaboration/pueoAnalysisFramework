@@ -63,8 +63,8 @@ class EventSummary : public TObject
   {
    public:
     PointingHypothesis() : fContainer(NULL) { ; }
-    Double_t phi = 0;  /// peak azimuth, degrees
-    Double_t theta = 0; /// peak elevation, degrees (NOT zenith)
+    Double_t phi = 0;  /// peak azimuth, degrees // pueoTALON rename: az
+    Double_t theta = 0; /// peak elevation, degrees (NOT zenith) // pueoTALON rename: el
     Double_t value = 0; /// peak value
     Double_t snr = 0; /// snr of peak
     Double_t mapRMS = 0; /// rms of interferometric map
@@ -80,9 +80,10 @@ class EventSummary : public TObject
     Double_t rho = 0;  /// correlation coefficient between theta and phi
     Double_t chisq = 0; /// chisq/ndof of peak finding process, if available (otherwise zero)
     Double_t theta_adjustment_needed = 0; /// If an event barely missed the ground, it is useful to see the coordinates at which it would hit if theta adjustment by a small amount. This is the calculated small amount that leads to it hitting the ground.
-    Double_t phi_separation = 0; /// angular separation from higher value peak in same event. 1000 if highest value event (i.e. first hypothesis)
-    Double_t dphi_rough = 0;  /// phi - phi rough
-    Double_t dtheta_rough = 0; /// theta - theta rough
+    Double_t phi_separation = 0; /// angular separation from higher value peak in same event. 1000 if highest value event (i.e. first hypothesis) // pueoTALON rename: az
+
+    Double_t dphi_rough = 0;  /// phi - phi rough // pueoTALON rename: az
+    Double_t dtheta_rough = 0; /// theta - theta rough  // pueoTALON rename: el
     Bool_t triggered = 0; /// was this in a triggered phi sector?
     Bool_t triggered_xpol = 0; /// was this in a triggered xpol phi sector?
     Bool_t masked = 0; /// was this in a masked phi sector?
@@ -154,6 +155,15 @@ class EventSummary : public TObject
     Double_t xPolPeakVal; //[0,4096,21]  /// Peak of xpol trace
     Double_t xPolPeakHilbert; //[0,4096,21]  /// Peak of xpol hilbert Envelope
 
+    /* added 082026 for pueoTALON */
+    Double_t pk2pk; // peak 2 peak value
+    Double_t rms; // rms of coherentsum
+    Double_t rmsHilbert; // rms of hilbert envelope
+    Double_t xPolPk2pk; // Peak of xpol trace
+    Double_t xPolRms; // RMS of xpol trace
+    Double_t xPolRmsHilbert; // RMS of xpol hilbert Envelope
+    /* ------ */
+
     Double_t I,Q,U,V;  /// Integral Stokes Parameters (over the entire waveform) 
     Double_t max_dI,max_dQ,max_dU,max_dV,polErr; /// instantanteous stokes parameters (computed near max_dI).
     Int_t NPointsMaxStokes; /// The number of points used in the above estimates 
@@ -174,6 +184,22 @@ class EventSummary : public TObject
     Double_t riseTime_10_50; //[0,128,16] /// Rise time of hilbert env from 10% to 50% of peak
     Double_t fallTime_90_10; //[0,128,16]/// Fall time of hilbert env from 90% to 10% of peak
     Double_t fallTime_50_10; //[0,128,16] /// Fall time of hilbert env from 50% to 10% of peak
+
+    /* added 082026 for pueoTALON */
+    Double_t scRiseTime_10_65; // Fraction of window length it takes to integrate from 10% total power to 65% total power
+    Double_t scRiseTime_20_65; // Fraction of window length it takes to integrate from 20% total power to 65% total power
+    Double_t scRiseTime_30_65; // Fraction of window length it takes to integrate from 30% total power to 65% total power
+    Double_t numPeaks; // Number of peaks in the waveform
+    Double_t riseTime_20_80; // Rise time from 20% to 80% of peak
+    Double_t riseTime_50_80; // Rise time from 50% to 80% of peak
+    Double_t riseTime_20_50; // Rise time from 20% to 50% of peak
+    Double_t fallTime_80_20; // Fall time from 80% to 20% of peak
+    Double_t fallTime_80_50; // Fall time from 50% to 80% of peak
+    Double_t fallTime_50_20; // Fall time from 50% to 20% of peak
+    Double_t width_20_20;  // Width from first envelope crossing of 20 percent of peak to last
+    Double_t power_20_20;  /// Power enclosed within 20_20 width
+    /* ------ */
+
     Double_t width_50_50;  //[0,128,16] /// Width from first envelope crossing of 50 percent of peak to last
     Double_t width_10_10;  //[0,128,16]/// Width from first envelope crossing of 10 percent of peak to last
     Double_t power_10_10;  /// Power enclosed within 10_10 width
@@ -251,6 +277,12 @@ class EventSummary : public TObject
     Double_t snr; //[0,100,16]/// Signal to Noise of waveform
     Double_t peakHilbert;//[0,4096,21]  /// peak of hilbert envelope
 
+    /* added 082026 */
+    std::vector<Double_t> sinsubtract_freq; //in GHz
+    std::vector<Double_t> sinsubtract_phase; //from -pi to +pi
+    std::vector<Double_t> sinsubtract_amp; //in nominal mV
+    /* -- */
+
     Double_t getPhi() const;
     inline Int_t getAnt() const {return ant;}                // could add some errors on -1 here...
     inline pueo::pol::pol_t getPol() const {return pol;} // could add some errors on 2 here...
@@ -290,8 +322,7 @@ class EventSummary : public TObject
 
     Int_t isGood;
     Int_t isRF;
-    Int_t isPPS0Trigger;
-    Int_t isPPS1Trigger;
+    Int_t isPPSTrigger; // pueoTALON: cmobine PPS0 PPS1
     Int_t isSoftwareTrigger;
     Int_t isMinBiasTrigger;
     Int_t isPayloadBlast;
@@ -440,9 +471,9 @@ class EventSummary : public TObject
   Int_t nPeaks[pueo::pol::kNotAPol]; /// Number of peaks stored in this EventSummary (might be less than maxDirectionsPerPol)
   PointingHypothesis peak[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the event peak directions (indices of all WaveformInfo member arrays match peak index)
   WaveformInfo coherent[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the (unfiltered) coherently summed waveforms, array index correponds to entry in peak[][]
-  WaveformInfo deconvolved[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the (unfiltered) de-dispersed coherently summed waveforms, array index correponds to entry in peak[][]
+  WaveformInfo deconvolved[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the (unfiltered) de-dispersed coherently summed waveforms, array index correponds to entry in peak[][] // pueoTALON rename: dedispersed
   WaveformInfo coherent_filtered[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the filtered, coherently summed waveforms, array index correponds to entry in peak[][]
-  WaveformInfo deconvolved_filtered[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the filtered, de-dispersed, coherently summed waveforms, array index correponds to entry in peak[][]
+  WaveformInfo deconvolved_filtered[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the filtered, de-dispersed, coherently summed waveforms, array index correponds to entry in peak[][]  // pueoTALON rename: dedispersed
   //BinnedAnalysis additions - JCF 9/29/2021
   WaveformInfo inputWfRaw[pueo::pol::kNotAPol][k::NUM_ANTS];
   WaveformInfo inputWfFiltered[pueo::pol::kNotAPol][k::NUM_ANTS];
@@ -452,6 +483,21 @@ class EventSummary : public TObject
   SourceHypothesis sun; /// Contains location of sun in map coordinates at time of event
   SourceHypothesis wais; /// Contains location of WAIS divide cal pulser in map coordinates at time of event
   SourceHypothesis ldb; /// Contains location of LDB cal pulser in map coordinates at time of event
+
+
+  /* added 082026 */
+  SourceHypothesis td; /// Contains location of TD cal pulser in map coordinates at time of event
+  SourceHypothesis s200; /// Contains location of S+200 cal pulser in map coordinates at time of event
+  SourceHypothesis hicalA; /// Contains location of HiCalA in map coordinates at time of event
+  SourceHypothesis hicalB; /// Contains location of HiCalB in map coordinates at time of event
+  SourceHypothesis muos1; /// Contains location of MUOS 1 in map coordinates at time of event
+  SourceHypothesis muos2; /// Contains location of MUOS 2 in map coordinates at time of event
+  SourceHypothesis muos3; /// Contains location of MUOS 3 in map coordinates at time of event
+  SourceHypothesis muos4; /// Contains location of MUOS 4 in map coordinates at time of event
+  SourceHypothesis muos5; /// Contains location of MUOS 5 in map coordinates at time of event
+  /* -- */
+
+
   MCTruth mc; /// Contains summary information about MC truth, if real data then this filled with constant, unphysical values.
   PayloadLocation location; /// Reduced GPS data
 
