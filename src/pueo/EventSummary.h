@@ -573,7 +573,7 @@ class EventSummary : public TObject
   void resetNonPersistent() const;
   const SourceHypothesis* sourceFromTag() const;
 
-  ClassDefNV(EventSummary, 1);
+  ClassDefNV(pueo::EventSummary, 1);
 };
 }
 
