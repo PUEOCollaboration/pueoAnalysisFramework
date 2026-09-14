@@ -524,7 +524,9 @@ class EventSummary : public TObject
   Int_t run; /// Run
   UInt_t eventNumber; /// Event number
   UInt_t realTime; /// Time of the event
-  Int_t nPeaks[pueo::pol::kNotAPol]; /// Number of peaks stored in this EventSummary (might be less than maxDirectionsPerPol)
+  /*Int_t nPeaks[pueo::pol::kNotAPol]; /// Number of peaks stored in this EventSummary (might be less than maxDirectionsPerPol)*/
+  std::array<int, pueo::pol::kNotAPol> nPeaks; /// Number of peaks stored in this EventSummary (might be less than maxDirectionsPerPol)
+
   PointingHypothesis peak[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the event peak directions (indices of all WaveformInfo member arrays match peak index)
   WaveformInfo coherent[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the (unfiltered) coherently summed waveforms, array index correponds to entry in peak[][]
   WaveformInfo deconvolved[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the (unfiltered) de-dispersed coherently summed waveforms, array index correponds to entry in peak[][]
