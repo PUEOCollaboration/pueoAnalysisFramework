@@ -41,7 +41,7 @@ class EventSummary : public TObject
   /*************************************************************************************
    * Static members (for array sizes inside class)
    *************************************************************************************/
-  static const Int_t maxDirectionsPerPol = 5; /// The maximum number of hypotheses storable per polarization */
+  static const Int_t maxDirectionsPerPol = 3; /// The maximum number of hypotheses storable per polarization */
   static const Int_t peaksPerSpectrum = 3; /// The maximum number of frequency peaks per waveform spectrum
   static const Int_t numFracPowerWindows = 5;
   static const Int_t numBlastPowerBands = 3;
@@ -63,8 +63,8 @@ class EventSummary : public TObject
   {
    public:
     PointingHypothesis() : fContainer(NULL) { ; }
-    Double_t phi = 0;  /// peak phi, degrees
-    Double_t theta = 0; /// peak theta, degrees
+    Double_t phi = 0;  /// peak azimuth, degrees
+    Double_t theta = 0; /// peak elevation, degrees (NOT zenith)
     Double_t value = 0; /// peak value
     Double_t snr = 0; /// snr of peak
     Double_t mapRMS = 0; /// rms of interferometric map
@@ -75,12 +75,8 @@ class EventSummary : public TObject
     Double_t longitude = 0;/// on continent, or -9999 if doesn't intersect
     Double_t altitude = 0;/// on continent, or -9999 if doesn't intersect
     Double_t distanceToSource = 0; /// on continent, or -9999 if doesn't intersect
-    Double_t sigma_theta = 0;  /// error on theta
-    Double_t sigma_phi = 0;  /// error on phi
-    Double_t rho = 0;  /// correlation coefficient between theta and phi
-    Double_t chisq = 0; /// chisq/ndof of peak finding process, if available (otherwise zero)
-    Double_t theta_adjustment_needed = 0; /// If an event barely missed the ground, it is useful to see the coordinates at which it would hit if theta adjustment by a small amount. This is the calculated small amount that leads to it hitting the ground.
     Double_t phi_separation = 0; /// angular separation from higher value peak in same event. 1000 if highest value event (i.e. first hypothesis)
+
     Double_t dphi_rough = 0;  /// phi - phi rough
     Double_t dtheta_rough = 0; /// theta - theta rough
     Bool_t triggered = 0; /// was this in a triggered phi sector?
@@ -88,6 +84,13 @@ class EventSummary : public TObject
     Bool_t masked = 0; /// was this in a masked phi sector?
     Bool_t masked_xpol = 0; /// was this in a masked phi xpol sector?
     Double_t antennaPeakAverage = 0; /// the average of channel peaks in this direction 
+
+    /* NOT CURRENTLY FILLED FOR PUEO [Aug 2026] */
+    Double_t sigma_theta = 0;  /// error on theta
+    Double_t sigma_phi = 0;  /// error on phi
+    Double_t rho = 0;  /// correlation coefficient between theta and phi
+    Double_t chisq = 0; /// chisq/ndof of peak finding process, if available (otherwise zero)
+    Double_t theta_adjustment_needed = 0; /// If an event barely missed the ground, it is useful to see the coordinates at which it would hit if theta adjustment by a small amount. This is the calculated small amount that leads to it hitting the ground.
 
     // Most basic resolution utility functions in payload coordinates relative to ADU5-aft-fore line
     Double_t dPhi(Double_t phi) const;
@@ -148,18 +151,57 @@ class EventSummary : public TObject
    public:
     WaveformInfo() : fContainer(NULL), fLastEventNumberCache(0), nwMeanCache(-1),
                      nwGradCache(-1), nwInterceptCache(-1), nwChisquareCache(-1) {; }
-    Double_t snr; //[0,100,16]  /// Signal to Noise of waveform
-    Double_t peakHilbert;//[0,4096,21]  /// peak of hilbert envelope
-    Double_t peakVal;  //[0,4096,21] /// peak value
-    Double_t xPolPeakVal; //[0,4096,21]  /// Peak of xpol trace
-    Double_t xPolPeakHilbert; //[0,4096,21]  /// Peak of xpol hilbert Envelope
+    Double_t snr; /// Signal to Noise of waveform
 
-    Double_t I,Q,U,V;  /// Integral Stokes Parameters (over the entire waveform) 
-    Double_t max_dI,max_dQ,max_dU,max_dV,polErr; /// instantanteous stokes parameters (computed near max_dI).
-    Int_t NPointsMaxStokes; /// The number of points used in the above estimates 
+    Double_t pk2pk; // peak 2 peak value [Aug 2026 PUEO addition]
+    Double_t rms; // rms of coherentsum [Aug 2026 PUEO addition]
+    Double_t peakHilbert;/// peak of hilbert envelope
+    Double_t rmsHilbert; // rms of hilbert envelope [Aug 2026 PUEO addition]
+    
+    Double_t xPolPk2pk; // Peak of xpol trace [Aug 2026 PUEO addition]
+    Double_t xPolRms; // RMS of xpol trace [Aug 2026 PUEO addition]
+    Double_t xPolPeakHilbert; /// Peak of xpol hilbert Envelope
+    Double_t xPolRmsHilbert; // RMS of xpol hilbert Envelope [Aug 2026 PUEO addition]
+
+    Double_t peakVal;  /// peak value
+    Double_t xPolPeakVal; /// Peak of xpol trace 
 
     Double_t totalPower;  /// Total power in waveform
     Double_t totalPowerXpol;  /// Total power in xPol waveform
+
+    Double_t I,Q,U,V;  /// Integral Stokes Parameters (over the entire waveform) 
+    Double_t max_dI,max_dQ,max_dU,max_dV,polErr; /// instantanteous stokes parameters (computed near max_dI).
+    Int_t NPointsMaxStokes; /// The number of points used in the above estimates
+
+    /* Aug 2026 PUEO additions, all calculated using Hilbert Envelope */
+    Double_t scRiseTime_10_65; // Fraction of window length it takes to integrate from 10% total power to 65% total power
+    Double_t scRiseTime_20_65; // Fraction of window length it takes to integrate from 20% total power to 65% total power
+    Double_t scRiseTime_30_65; // Fraction of window length it takes to integrate from 30% total power to 65% total power
+
+    Double_t numPeaks; // Number of peaks in the waveform
+
+    Double_t riseTime_20_80; // Rise time from 20% to 80% of peak
+    Double_t riseTime_50_80; // Rise time from 50% to 80% of peak
+    Double_t riseTime_20_50; // Rise time from 20% to 50% of peak
+
+    Double_t fallTime_80_20; // Fall time from 80% to 20% of peak
+    Double_t fallTime_80_50; // Fall time from 50% to 80% of peak
+    Double_t fallTime_50_20; // Fall time from 50% to 20% of peak
+
+    Double_t width_20_20;  // Width from first envelope crossing of 20 percent of peak to last
+    Double_t power_20_20;  /// Power enclosed within 20_20 width
+
+    /* ------ */
+
+    Double_t width_50_50;  /// Width from first envelope crossing of 50 percent of peak to last
+    Double_t power_50_50;  /// Power enclosed within 50_50 width
+
+    Double_t fracPowerWindowBegins[numFracPowerWindows]; /// Narrowest width containing {10%, 20%, 30%, 40%, 50%} of the total power
+    Double_t fracPowerWindowEnds[numFracPowerWindows]; /// Narrowest width containing {10%, 20%, 30%, 40%, 50%} of the total power
+
+    Int_t numAntennasInCoherent; /// Number of antennas used to make this
+
+    /* NOT CURRENTLY FILLED FOR PUEO [Aug 2026] */
 
     //spectrum info
     Double_t bandwidth[peaksPerSpectrum]; //[0,2,16] /// bandwidth of each peak (implementation defined, may not be comparable between analyses)
@@ -174,25 +216,22 @@ class EventSummary : public TObject
     Double_t riseTime_10_50; //[0,128,16] /// Rise time of hilbert env from 10% to 50% of peak
     Double_t fallTime_90_10; //[0,128,16]/// Fall time of hilbert env from 90% to 10% of peak
     Double_t fallTime_50_10; //[0,128,16] /// Fall time of hilbert env from 50% to 10% of peak
-    Double_t width_50_50;  //[0,128,16] /// Width from first envelope crossing of 50 percent of peak to last
+
     Double_t width_10_10;  //[0,128,16]/// Width from first envelope crossing of 10 percent of peak to last
     Double_t power_10_10;  /// Power enclosed within 10_10 width
-    Double_t power_50_50;  /// Power enclosed within 50_50 width
+
     Double_t peakTime;  //[-128,384,18] /// Time that peak hilbert env occurs
     Double_t peakMoments[5];  /// moments about Peak  (1st - 5th moments)
 
     Double_t impulsivityMeasure; //[-1,1, 16]  /// A number that has something to do with how impulsive it is
     Double_t bandwidthMeasure; 
-    Double_t fracPowerWindowBegins[numFracPowerWindows]; //[0,128,16] /// Narrowest width containing {10%, 20%, 30%, 40%, 50%} of the total power
-    Double_t fracPowerWindowEnds[numFracPowerWindows]; //[0,128,16] /// Narrowest width containing {10%, 20%, 30%, 40%, 50%} of the total power
-
-    Int_t numAntennasInCoherent; /// Number of antennas used to make this
 
     Double_t localMaxToMin; //[0,4096,21] /// Largest value of local max to neighbouring local min (see Acclaim::RootTools::getLocalMaxToMin)
     Double_t localMaxToMinTime; //[0,100,16] /// Time between local maxima and minima +ve means max is before min, -ve means min is before max
     Double_t globalMaxToMin; //[0,4096,21] /// Difference between maximum and minimum voltage
     Double_t globalMaxToMinTime; //[0,128,16] /// Time between maximum and minimum volts, +ve means max is before min, -ve means min is before max
 
+    /* ------ */
 
     //some utilities for polarization info
     Double_t linearPolFrac() const;
@@ -246,10 +285,15 @@ class EventSummary : public TObject
     /// Correct indices are set in the EventSummary constructor
     ChannelInfo() : pol(pueo::pol::kNotAPol), ant(-1) {; }
 
-    Double_t rms; //[0,1024,20]
+    Double_t rms; 
     Double_t avgPower;
-    Double_t snr; //[0,100,16]/// Signal to Noise of waveform
-    Double_t peakHilbert;//[0,4096,21]  /// peak of hilbert envelope
+    Double_t snr; /// Signal to Noise of waveform
+    Double_t peakHilbert;/// peak of hilbert envelope
+
+    std::vector<Double_t> sinsubtract_freq; //in GHz [Aug 2026 PUEO addition]
+    std::vector<Double_t> sinsubtract_phase; //from -pi to +pi [Aug 2026 PUEO addition]
+    std::vector<Double_t> sinsubtract_amp; //in nominal mV [Aug 2026 PUEO addition]
+
 
     Double_t getPhi() const;
     inline Int_t getAnt() const {return ant;}                // could add some errors on -1 here...
@@ -275,11 +319,19 @@ class EventSummary : public TObject
   class EventFlags
   {
    public:
-    EventFlags() {; }
+    EventFlags() : pulser(NONE), hicalPath(NOT_HICAL) {; }
     /** Is this event from a cal pulser? */
     enum CalPulser
     {
       NONE,
+      LDB_H, // Aug 2026 PUEO addition
+      LDB_V, // Aug 2026 PUEO addition
+      TD_H, // Aug 2026 PUEO addition
+      TD_V, // Aug 2026 PUEO addition
+      S200_H, // Aug 2026 PUEO addition
+      S200_V, // Aug 2026 PUEO addition
+      HICALA, // Aug 2026 PUEO addition
+      HICALB, // Aug 2026 PUEO addition
       WAIS,  // is actually Hpol wais in both A3 and A4
       LDB,
       SIPLE,
@@ -288,25 +340,62 @@ class EventSummary : public TObject
       HICAL // HICAL2 flag
     };
 
+    enum HiCalPath
+    {
+      NOT_HICAL = 0,
+      HICAL_DIRECT,
+      HICAL_REFLECTED,
+      HICAL_UNKNOWN
+    };
+
     Int_t isGood;
     Int_t isRF;
     Int_t isPPS0Trigger;
-    Int_t isPPS1Trigger;
-    Int_t isSoftwareTrigger;
-    Int_t isMinBiasTrigger;
-    Int_t isPayloadBlast;
-    Int_t nadirFlag;
-    Int_t strongCWFlag;
     Int_t isHPolTrigger;
     Int_t isVPolTrigger;
-    Int_t isStepFunction;
-    Int_t hasGlitch;
+
+    //Quality Cut Flags
+    Int_t isPayloadBlast;
+    Int_t strongCWFlag;
+    Int_t hasGlitch; //Data is flatlined in some way
+
+    /* Aug 2026 PUEO addition */
+
+    Double_t blastImpulsivity; //impulsivity measure for blast checking
+    Double_t blastCW; //CW measure for blast checking
+    Int_t isSaturated;
+    Int_t isShortRun; //for short runs
+    Int_t isMissingFT; //for runs with no force triggers
+    Int_t isMissingPPS; //for runs with no PPS
+    Int_t unsualFT; //force trigger / pps rates too high for this run
+    Int_t noRF; //no RF triggers in run
+    Int_t noDaqHsk; //no DAQ HSK information for htis run
+    Int_t lowThermal; //Median of all channels have low RMS values
+    Int_t lowChannelThermal;  //at least one channel has low RMS values
+    Int_t isInDeadtime; //Event occurs in first 2 seconds of a run, before AGC and masking have settled
+    Int_t allTrigsMasked; //All triggered channels are in masked off phi sectors
+    Int_t isMUOSContaminated; //If MUOS is present in trigger
+
+    /* ------ */
 
     CalPulser pulser;
+    HiCalPath hicalPath;
+
+    /** The fraction of nearby events that are payload blasts */
+    Double_t blastFraction;
+
+    /* NOT CURRENTLY FILLED FOR PUEO [Aug 2026] */
+
+    Int_t isPPS1Trigger; // not used, see pueo/Convention.h
+    Int_t isSoftwareTrigger;
+    Int_t isMinBiasTrigger;
+    Int_t nadirFlag;
+    Int_t isStepFunction;
+
     Bool_t isVarner;
     Bool_t isVarner2;
 
-    /** These are used to cut out payload blasts and stuf like that.
+     /** These are used to cut out payload blasts and stuf like that.
      *  The first element is the total, and then the next are by ring
      *  So to get the top ring, do 1 + pueo::ring::kTopRing, etc.
      */
@@ -322,13 +411,12 @@ class EventSummary : public TObject
 
     Int_t nSectorsWhereBottomExceedsTop;
 
-    /** The fraction of nearby events that are payload blasts */
-    Double_t blastFraction;
-
     Double_t middleOrBottomPower[numBlastPowerBands];
     Double_t topPower[numBlastPowerBands];
     Int_t middleOrBottomAnt[numBlastPowerBands];
     Int_t middleOrBottomPol[numBlastPowerBands];
+
+    /* ------ */
 
     ClassDefNV(EventFlags,1);
   };
@@ -372,7 +460,6 @@ class EventSummary : public TObject
     WaveformInfo wf[pueo::pol::kNotAPol];
     Double_t weight;
     Double_t energy;
-//    Double_t triggerSNR[2]; 
     TVector3 nuDirection; //in earth centered fixed coordinates (i.e. Cartesian coordinates of neutrino far away)
     double nuTheta, nuPhi; //neutrino (not RF!) direction in payload coordinates -> ray at infinity
     double interactionTheta, interactionPhi; //neutrino interaction angle to PUEO in payload coordinates
@@ -407,11 +494,11 @@ class EventSummary : public TObject
     Float_t prevHeading; //useful for determining rotation rate
 
     void reset() { latitude = -999; longitude = -999; altitude = -999; heading = -999; prevHeading = -999;};
-    void update(const nav::Attitude* pat); /// Copy the data from the pat into the object
+    void update(const nav::Attitude* att); /// Copy the data from the attitude into the object
 
     /**
-     * Convert to an Adu5Pat, (mostly to then instantiate a Adu5Pat)
-     * @return an Adu5Pat only with location information
+     * Convert to an Attitude object,
+     * @return an Attitude object only with location information
      */
     pueo::nav::Attitude att () const {
       pueo::nav::Attitude att;
@@ -437,23 +524,45 @@ class EventSummary : public TObject
   Int_t run; /// Run
   UInt_t eventNumber; /// Event number
   UInt_t realTime; /// Time of the event
-  Int_t nPeaks[pueo::pol::kNotAPol]; /// Number of peaks stored in this EventSummary (might be less than maxDirectionsPerPol)
+  /*Int_t nPeaks[pueo::pol::kNotAPol]; /// Number of peaks stored in this EventSummary (might be less than maxDirectionsPerPol)*/
+  std::array<int, pueo::pol::kNotAPol> nPeaks; /// Number of peaks stored in this EventSummary (might be less than maxDirectionsPerPol)
+
   PointingHypothesis peak[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the event peak directions (indices of all WaveformInfo member arrays match peak index)
   WaveformInfo coherent[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the (unfiltered) coherently summed waveforms, array index correponds to entry in peak[][]
   WaveformInfo deconvolved[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the (unfiltered) de-dispersed coherently summed waveforms, array index correponds to entry in peak[][]
   WaveformInfo coherent_filtered[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the filtered, coherently summed waveforms, array index correponds to entry in peak[][]
   WaveformInfo deconvolved_filtered[pueo::pol::kNotAPol][maxDirectionsPerPol]; /// Summaries of the filtered, de-dispersed, coherently summed waveforms, array index correponds to entry in peak[][]
+  
+  ChannelInfo channels[pueo::pol::kNotAPol][k::NUM_ANTS]; /// Summaries of each channel's waveform.
+  EventFlags flags; /// Flags corresponding the event quality, trigger type, calibration pulser timing, etc.
+  SourceHypothesis sun; /// Contains location of sun in map coordinates at time of event
+  SourceHypothesis ldb; /// Contains location of LDB cal pulser in map coordinates at time of event
+
+  /*  Aug 2026 PUEO additions */
+  SourceHypothesis td; /// Contains location of TD cal pulser in map coordinates at time of event
+  SourceHypothesis s200; /// Contains location of S+200 cal pulser in map coordinates at time of event
+  SourceHypothesis hicalA; /// Contains location of HiCalA in map coordinates at time of event
+  SourceHypothesis hicalB; /// Contains location of HiCalB in map coordinates at time of event
+  SourceHypothesis muos1; /// Contains location of MUOS 1 in map coordinates at time of event
+  SourceHypothesis muos2; /// Contains location of MUOS 2 in map coordinates at time of event
+  SourceHypothesis muos3; /// Contains location of MUOS 3 in map coordinates at time of event
+  SourceHypothesis muos4; /// Contains location of MUOS 4 in map coordinates at time of event
+  SourceHypothesis muos5; /// Contains location of MUOS 5 in map coordinates at time of event
+  /* -- */
+
+  PayloadLocation location; /// Reduced GPS data
+
+  /* NOT CURRENTLY FILLED FOR PUEO [Aug 2026] */
+
+  SourceHypothesis wais; /// Contains location of WAIS divide cal pulser in map coordinates at time of event
+  MCTruth mc; /// Contains summary information about MC truth, if real data then this filled with constant, unphysical values.
+  
   //BinnedAnalysis additions - JCF 9/29/2021
   WaveformInfo inputWfRaw[pueo::pol::kNotAPol][k::NUM_ANTS];
   WaveformInfo inputWfFiltered[pueo::pol::kNotAPol][k::NUM_ANTS];
   //End BinnedAnalysis additions
-  ChannelInfo channels[pueo::pol::kNotAPol][k::NUM_ANTS]; /// Summaries of each channel's waveform.
-  EventFlags flags; /// Flags corresponding the event quality, trigger type, calibration pulser timing, etc.
-  SourceHypothesis sun; /// Contains location of sun in map coordinates at time of event
-  SourceHypothesis wais; /// Contains location of WAIS divide cal pulser in map coordinates at time of event
-  SourceHypothesis ldb; /// Contains location of LDB cal pulser in map coordinates at time of event
-  MCTruth mc; /// Contains summary information about MC truth, if real data then this filled with constant, unphysical values.
-  PayloadLocation location; /// Reduced GPS data
+
+  /* -- */
 
 
   //------------------------------------------------------------------------------------
@@ -526,7 +635,7 @@ class EventSummary : public TObject
   void resetNonPersistent() const;
   const SourceHypothesis* sourceFromTag() const;
 
-  ClassDefNV(EventSummary, 1);
+  ClassDefNV(pueo::EventSummary, 1);
 };
 }
 
