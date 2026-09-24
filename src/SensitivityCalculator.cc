@@ -165,7 +165,7 @@ double pueo::SensitivityCalculator::getLimit(int nobs, double * lower, double * 
     return 0; 
   }
 #endif
-
+    return -999;
 
 }
 

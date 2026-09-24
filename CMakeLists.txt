@@ -3,61 +3,61 @@ project(pueoAnalysisFramework VERSION 0.0.1)
 add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME} PRIVATE
-  # src/AnalysisWaveform.cc
-  # src/BandwidthMeasure.cc
-  # src/BasicFilters.cc
-  # src/CorrelationSummary.cc
-  # src/DiodeFilter.cc
-  # src/EventFaker.cc
+  src/AnalysisWaveform.cc
+  src/BandwidthMeasure.cc
+  src/BasicFilters.cc
+  src/CorrelationSummary.cc
+  src/DiodeFilter.cc
+  src/EventFaker.cc
   src/EventSummary.cc
-  # src/FilterOperation.cc
-  # src/FilterStrategy.cc
-  # src/FilteredEvent.cc
-  # src/FreqDomainFunction.cc
-  # src/GeomFilter.cc
-  # src/ImpulsivityMeasure.cc
-  # src/InterpolatedNotch.cc
-  # src/NoiseMonitor.cc
-  # src/NoiseSummary.cc
-  # src/Polarimetry.cc
-  # src/PrettyAnalysisWaveform.cc
-  # src/ResponseManager.cc
-  # src/SensitivityCalculator.cc
-  # src/SystemResponse.cc
-  # src/TGraphAligned.cc
-  # src/TMVA.cc
-  # src/TaperFilter.cc
-  # src/Templates.cc
-  # src/UsefulAttitude.cc
+  src/FilterOperation.cc
+  src/FilterStrategy.cc
+  src/FilteredEvent.cc
+  src/FreqDomainFunction.cc
+  src/GeomFilter.cc
+  src/ImpulsivityMeasure.cc
+  src/InterpolatedNotch.cc
+  src/NoiseMonitor.cc
+  src/NoiseSummary.cc
+  src/Polarimetry.cc
+  src/PrettyAnalysisWaveform.cc
+  src/ResponseManager.cc
+  src/SensitivityCalculator.cc
+  src/SystemResponse.cc
+  src/TGraphAligned.cc
+  src/TMVA.cc
+  src/TaperFilter.cc
+  src/Templates.cc
+  src/UsefulAttitude.cc
 )
 set(HEADER_FILES
-  # src/pueo/AnalysisWaveform.h
-  # src/pueo/BandwidthMeasure.h
-  # src/pueo/BasicFilters.h
-  # src/pueo/CorrelationSummary.h
-  # src/pueo/DiodeFilter.h
-  # src/pueo/EventFaker.h
-  # src/pueo/EventReconstructor.h
+  src/pueo/AnalysisWaveform.h
+  src/pueo/BandwidthMeasure.h
+  src/pueo/BasicFilters.h
+  src/pueo/CorrelationSummary.h
+  src/pueo/DiodeFilter.h
+  src/pueo/EventFaker.h
+  src/pueo/EventReconstructor.h
   src/pueo/EventSummary.h
-  # src/pueo/FilterOperation.h
-  # src/pueo/FilterStrategy.h
-  # src/pueo/FilteredEvent.h
-  # src/pueo/FreqDomainFunction.h
-  # src/pueo/GeomFilter.h
-  # src/pueo/ImpulsivityMeasure.h
-  # src/pueo/InterpolatedNotch.h
-  # src/pueo/NoiseMonitor.h
-  # src/pueo/NoiseSummary.h
-  # src/pueo/Polarimetry.h
-  # src/pueo/PrettyAnalysisWaveform.h
-  # src/pueo/ResponseManager.h
-  # src/pueo/SensitivityCalculator.h
-  # src/pueo/SystemResponse.h
-  # src/pueo/TGraphAligned.h
-  # src/pueo/TMVA.h
-  # src/pueo/TaperFilter.h
-  # src/pueo/Templates.h
-  # src/pueo/UsefulAttitude.h
+  src/pueo/FilterOperation.h
+  src/pueo/FilterStrategy.h
+  src/pueo/FilteredEvent.h
+  src/pueo/FreqDomainFunction.h
+  src/pueo/GeomFilter.h
+  src/pueo/ImpulsivityMeasure.h
+  src/pueo/InterpolatedNotch.h
+  src/pueo/NoiseMonitor.h
+  src/pueo/NoiseSummary.h
+  src/pueo/Polarimetry.h
+  src/pueo/PrettyAnalysisWaveform.h
+  src/pueo/ResponseManager.h
+  src/pueo/SensitivityCalculator.h
+  src/pueo/SystemResponse.h
+  src/pueo/TGraphAligned.h
+  src/pueo/TMVA.h
+  src/pueo/TaperFilter.h
+  src/pueo/Templates.h
+  src/pueo/UsefulAttitude.h
 )
 
 target_sources(${PROJECT_NAME} PUBLIC
