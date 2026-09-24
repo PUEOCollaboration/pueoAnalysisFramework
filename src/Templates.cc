@@ -331,89 +331,89 @@ void pueo::TemplateMachine::loadTemplates(unsigned int evTime, int version) {
  
 
 
-void pueo::TemplateMachine::deconvolveTemplates(pueo::DeconvolutionMethod *deconv) {
-  if(kTmpltsDeconv) return;
-
-  std::cout << "Deconvolving templates" << std::endl;
-  
-  std::stringstream name;
-  
-  if (!isTmpltsLoaded()) {
-    std::cout << "Error in pueo::TemplateAnalyzer::deconvolveTemplates(): pueo::TemplateMachine says it has no templates!" << std::endl;
-    std::cout << "      Try doing pueo::TemplateMachine::loadTemplates() at some point maybe? " << std::endl;
-    return;
-  }
-  
-  double dF = 1./(dT*length);
-
-  int lengthFFT = (length/2 + 1);
-
-  /** Impulse Response */
-  std::cout << "0" << std::endl;
-  theImpTemplateFFT_deconv = (FFTWComplex*)malloc(lengthFFT*sizeof(FFTWComplex));
-  for (int i=0; i<lengthFFT; i++) {
-    theImpTemplateFFT_deconv[i] = theImpTemplateFFT[i];
-  }				    
-  std::cout << "1" << std::endl;
-  deconv->deconvolve(lengthFFT,dF,theImpTemplateFFT_deconv,theImpTemplateFFT);
-  double* theImpTemplate_deconv_y = FFTtools::doInvFFT(length,theImpTemplateFFT_deconv);
-  std::cout << "2" << std::endl;
-  theImpTemplate_deconv = new TGraph(length,theImpTemplate->GetX(),theImpTemplate_deconv_y);
-  theImpTemplate_deconv->SetName("deconvImp");
-
-  /** Wais */
-  theWaisTemplateFFT_deconv = (FFTWComplex*)malloc(lengthFFT*sizeof(FFTWComplex));
-  for (int i=0; i<(length/2 + 1); i++) {
-    theWaisTemplateFFT_deconv[i] = theWaisTemplateFFT[i];
-  }				    
-  deconv->deconvolve(lengthFFT,dF,theWaisTemplateFFT_deconv,theImpTemplateFFT);
-  double* theWaisTemplate_deconv_y = FFTtools::doInvFFT(length,theWaisTemplateFFT_deconv);
-  theWaisTemplate_deconv = new TGraph(length,theWaisTemplate->GetX(),theWaisTemplate_deconv_y);
-  theWaisTemplate_deconv->SetName("deconvWais");
-
-
-  /**CR templates */
-  if(!fUseAverageCRTemplate)
-  {
-    for (int cr = 0; cr<numCRTemplates; cr++ ) {
-      theCRTemplateFFTs_deconv[cr] = (FFTWComplex*)malloc(lengthFFT*sizeof(FFTWComplex));
-      for (int i=0; i<(length/2 + 1); i++) {
-        theCRTemplateFFTs_deconv[cr][i] = theCRTemplateFFTs[cr][i];
-      }				    
-      deconv->deconvolve(lengthFFT,dF,theCRTemplateFFTs_deconv[cr],theImpTemplateFFT);
-      double* theCRTemplate_deconv_y = FFTtools::doInvFFT(length,theCRTemplateFFTs_deconv[cr]);
-      theCRTemplates_deconv[cr] = new TGraph(length,theCRTemplates[cr]->GetX(),theCRTemplate_deconv_y);
-      name.str("");
-      name << "deconvCR" << cr;
-      theCRTemplates_deconv[cr]->SetName(name.str().c_str());
-    }
-  } 
-
-  if(fUseAverageCRTemplate)
-  {
-    char* installDir = getenv("PUEO_UTIL_INSTALL_DIR");
-    TString crfname = Form("%s/share/pueoAnalysisFramework/templates/deconvolvedCRA4average.txt", installDir);
-    
-    TGraph* grTemplateCut = new TGraph(crfname.Data());
-    TGraph *grTemplate = FFTtoolsAnnex::normalizeWaveform(grTemplateCut);
-    delete grTemplateCut;
-
-    //give it a name
-    grTemplate->SetName("disp0");
-    int phl = -1;
-    if(fDoWindow) grTemplate = WindowingTools::windowWave(grTemplate, phl, 30, 30, 50, 50);
-
-    //and get the FFT of it as well, since we don't want to do this every single event
-    FFTWComplex *theTemplateFFT=FFTtools::doFFT(grTemplate->GetN(),grTemplate->GetY());
-    theCRTemplates_deconv[0] = grTemplate;
-    theCRTemplateFFTs_deconv[0] = theTemplateFFT;
-  } 
-
-  kTmpltsDeconv = true;
-
-  return;
-
-}
+// void pueo::TemplateMachine::deconvolveTemplates(pueo::DeconvolutionMethod *deconv) {
+//   if(kTmpltsDeconv) return;
+//
+//   std::cout << "Deconvolving templates" << std::endl;
+//
+//   std::stringstream name;
+//
+//   if (!isTmpltsLoaded()) {
+//     std::cout << "Error in pueo::TemplateAnalyzer::deconvolveTemplates(): pueo::TemplateMachine says it has no templates!" << std::endl;
+//     std::cout << "      Try doing pueo::TemplateMachine::loadTemplates() at some point maybe? " << std::endl;
+//     return;
+//   }
+//
+//   double dF = 1./(dT*length);
+//
+//   int lengthFFT = (length/2 + 1);
+//
+//   /** Impulse Response */
+//   std::cout << "0" << std::endl;
+//   theImpTemplateFFT_deconv = (FFTWComplex*)malloc(lengthFFT*sizeof(FFTWComplex));
+//   for (int i=0; i<lengthFFT; i++) {
+//     theImpTemplateFFT_deconv[i] = theImpTemplateFFT[i];
+//   }				    
+//   std::cout << "1" << std::endl;
+//   deconv->deconvolve(lengthFFT,dF,theImpTemplateFFT_deconv,theImpTemplateFFT);
+//   double* theImpTemplate_deconv_y = FFTtools::doInvFFT(length,theImpTemplateFFT_deconv);
+//   std::cout << "2" << std::endl;
+//   theImpTemplate_deconv = new TGraph(length,theImpTemplate->GetX(),theImpTemplate_deconv_y);
+//   theImpTemplate_deconv->SetName("deconvImp");
+//
+//   /** Wais */
+//   theWaisTemplateFFT_deconv = (FFTWComplex*)malloc(lengthFFT*sizeof(FFTWComplex));
+//   for (int i=0; i<(length/2 + 1); i++) {
+//     theWaisTemplateFFT_deconv[i] = theWaisTemplateFFT[i];
+//   }				    
+//   deconv->deconvolve(lengthFFT,dF,theWaisTemplateFFT_deconv,theImpTemplateFFT);
+//   double* theWaisTemplate_deconv_y = FFTtools::doInvFFT(length,theWaisTemplateFFT_deconv);
+//   theWaisTemplate_deconv = new TGraph(length,theWaisTemplate->GetX(),theWaisTemplate_deconv_y);
+//   theWaisTemplate_deconv->SetName("deconvWais");
+//
+//
+//   /**CR templates */
+//   if(!fUseAverageCRTemplate)
+//   {
+//     for (int cr = 0; cr<numCRTemplates; cr++ ) {
+//       theCRTemplateFFTs_deconv[cr] = (FFTWComplex*)malloc(lengthFFT*sizeof(FFTWComplex));
+//       for (int i=0; i<(length/2 + 1); i++) {
+//         theCRTemplateFFTs_deconv[cr][i] = theCRTemplateFFTs[cr][i];
+//       }				    
+//       deconv->deconvolve(lengthFFT,dF,theCRTemplateFFTs_deconv[cr],theImpTemplateFFT);
+//       double* theCRTemplate_deconv_y = FFTtools::doInvFFT(length,theCRTemplateFFTs_deconv[cr]);
+//       theCRTemplates_deconv[cr] = new TGraph(length,theCRTemplates[cr]->GetX(),theCRTemplate_deconv_y);
+//       name.str("");
+//       name << "deconvCR" << cr;
+//       theCRTemplates_deconv[cr]->SetName(name.str().c_str());
+//     }
+//   } 
+//
+//   if(fUseAverageCRTemplate)
+//   {
+//     char* installDir = getenv("PUEO_UTIL_INSTALL_DIR");
+//     TString crfname = Form("%s/share/pueoAnalysisFramework/templates/deconvolvedCRA4average.txt", installDir);
+//
+//     TGraph* grTemplateCut = new TGraph(crfname.Data());
+//     TGraph *grTemplate = FFTtoolsAnnex::normalizeWaveform(grTemplateCut);
+//     delete grTemplateCut;
+//
+//     //give it a name
+//     grTemplate->SetName("disp0");
+//     int phl = -1;
+//     if(fDoWindow) grTemplate = WindowingTools::windowWave(grTemplate, phl, 30, 30, 50, 50);
+//
+//     //and get the FFT of it as well, since we don't want to do this every single event
+//     FFTWComplex *theTemplateFFT=FFTtools::doFFT(grTemplate->GetN(),grTemplate->GetY());
+//     theCRTemplates_deconv[0] = grTemplate;
+//     theCRTemplateFFTs_deconv[0] = theTemplateFFT;
+//   } 
+//
+//   kTmpltsDeconv = true;
+//
+//   return;
+//
+// }
 
 
 

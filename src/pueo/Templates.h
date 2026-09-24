@@ -78,6 +78,7 @@ class TemplateMachine : public TObject {
 
   /** Filling the stored templates **/
   void loadTemplates( unsigned int evTime = 0, int version = pueo::version::get());
+  __attribute__((deprecated)) 
   void deconvolveTemplates(DeconvolutionMethod *deconv);
   
 

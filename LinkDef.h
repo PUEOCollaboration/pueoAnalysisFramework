@@ -70,7 +70,6 @@
 #pragma link C++ class pueo::EventFaker+; 
 #pragma link C++ class pueo::SensitivityCalculator+; 
 #pragma link C++ class pueo::FreqDomainFunction+; 
-#pragma link C++ class pueo::PayloadParameters+; 
 #pragma link C++ class pueo::UsefulAttitude+; 
 
 
