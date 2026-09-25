@@ -119,7 +119,7 @@ TTree* pueo::TMVA::makeTMVATree(int ntrees, TTree ** in, TFile * outf, const cha
 //  printf("%s\n",drawstr.str().c_str()); 
 
   //now the real work happens... which we can parallelize! 
-#ifdef USE_OMP
+#ifdef ANALYSIS_FRAMEWORK_USE_OMP
 #pragma omp parallel for 
 #endif
   for (int t = 0; t < ntrees; t++) 

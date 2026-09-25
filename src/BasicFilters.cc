@@ -42,7 +42,7 @@ void pueo::SimpleNotchFilter::processOne(AnalysisWaveform* g, const RawHeader * 
 
 void pueo::HybridFilter::process(FilteredEvent * event) {
 
-#ifdef USE_OMP
+#ifdef ANALYSIS_FRAMEWORK_USE_OMP
 #pragma omp  parallel for 
 #endif
 
@@ -55,7 +55,7 @@ void pueo::HybridFilter::processOne(AnalysisWaveform* g, const RawHeader* header
 
 void pueo::SumDifferenceFilter::process(FilteredEvent * event) {
 
-#ifdef USE_OMP
+#ifdef ANALYSIS_FRAMEWORK_USE_OMP
 #pragma omp  parallel for 
 #endif
 
@@ -68,7 +68,7 @@ void pueo::SumDifferenceFilter::processOne(AnalysisWaveform* g, const RawHeader*
 
 void pueo::FlipHVFilter::process(FilteredEvent * event) {
 
-#ifdef USE_OMP
+#ifdef ANALYSIS_FRAMEWORK_USE_OMP
 #pragma omp  parallel for 
 #endif
 

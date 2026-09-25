@@ -1543,7 +1543,7 @@ void pueo::AnalysisWaveform::setCorrelationNag(bool nag)
 
 void pueo::AnalysisWaveform::nameGraphs() 
 {
-#ifdef USE_OMP
+#ifdef ANALYSIS_FRAMEWORK_USE_OMP
 #pragma omp critical 
 #endif
   {

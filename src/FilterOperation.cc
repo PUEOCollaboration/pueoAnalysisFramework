@@ -47,7 +47,7 @@ void pueo::ConditionalFilterOperation::process(FilteredEvent * ev)
   for (int pol = pol::kHorizontal; pol <= pol::kVertical; pol++)
   {
 
-#ifdef USE_OMP
+#ifdef ANALYSIS_FRAMEWORK_USE_OMP
 #pragma omp parallel for
 #endif
     for (int ant = 0; ant <k::NUM_ANTS; ant++) 
@@ -67,7 +67,7 @@ void pueo::ConditionalFilterOperation::processOne(AnalysisWaveform* awf, const R
 
 void pueo::UniformFilterOperation::process(FilteredEvent * ev) 
 {
-#ifdef USE_OMP
+#ifdef ANALYSIS_FRAMEWORK_USE_OMP
 #pragma omp parallel for
 #endif
   for (size_t i = 0; i < k::NUM_ANTS * 2; i++) 

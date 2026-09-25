@@ -79,7 +79,7 @@ find_package(OpenMP)
 #    1) https://cmake.org/cmake/help/latest/module/FindOpenMP.html#result-variables
 #    2) https://cliutils.gitlab.io/modern-cmake/chapters/packages/OpenMP.html
 if(OpenMP_CXX_FOUND)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE USE_OMP)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE ANALYSIS_FRAMEWORK_USE_OMP)
   target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
 else()
   message(STATUS "OpenMP not found, compiling without it.")
@@ -139,6 +139,8 @@ endif()
 
 
 ## ------------- TODO -------------
+
+# ROOSTATS!
 
 # #-- Wavelet Deconvolution using FoRWarD.
 # option(WAVELETDECONV "Enable Wavelet Deconvolution." OFF)
