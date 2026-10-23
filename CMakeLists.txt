@@ -86,16 +86,21 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} 
-  PUBLIC ROOT::TreePlayer AntarcticaRoot::AntarcticaRoot PUEO::pueoEvent
+  PUBLIC ROOT::TreePlayer ROOT::TMVA AntarcticaRoot::AntarcticaRoot PUEO::pueoEvent
 )
 # CERN ROOT dictionary generation and installation
 set(DICTNAME G__${PROJECT_NAME})
 root_generate_dictionary(${DICTNAME} ${HEADER_FILES} MODULE ${PROJECT_NAME} LINKDEF LinkDef.h)
+# installing CERN ROOT's _rdict.pcm file
+# Do make sure to install the .rootmap file,
+# otherwise very confusing errors can error when you run root macros. See:
+# https://root-forum.cern.ch/t/base-class-has-incomplete-type-if-i-running-from-rootscript/62827/4
 install(
-  FILES "${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_NAME}_rdict.pcm"
-  DESTINATION lib
+  FILES 
+    "${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_NAME}_rdict.pcm"
+    "${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_NAME}.rootmap"
+  DESTINATION lib # force install to lib instead of letting the system choose b/w lib vs lib64
 )
-
 
 
 ## ------------- Installation -------------
