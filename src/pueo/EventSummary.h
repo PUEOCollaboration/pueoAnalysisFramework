@@ -66,6 +66,12 @@ class EventSummary : public TObject
     Double_t phi = 0;  /// peak azimuth, degrees
     Double_t theta = 0; /// peak elevation, degrees (NOT zenith)
     Double_t value = 0; /// peak value
+
+    Double_t sigma_theta = 0;  /// sigma of theta
+    Double_t sigma_phi = 0;  /// sigma of phi
+    Double_t rho = 0;  /// correlation coefficient between theta and phi
+    Double_t chisq = 0; /// chisq/ndof of peak finding process, if available (otherwise zero)
+
     Double_t snr = 0; /// snr of peak
     Double_t mapRMS = 0; /// rms of interferometric map
     Double_t mapHistoryVal = 0; /// value of average of the peak location over the past 60 min-bias events
@@ -85,11 +91,6 @@ class EventSummary : public TObject
     Bool_t masked_xpol = 0; /// was this in a masked phi xpol sector?
     Double_t antennaPeakAverage = 0; /// the average of channel peaks in this direction 
 
-    /* NOT CURRENTLY FILLED FOR PUEO [Aug 2026] */
-    Double_t sigma_theta = 0;  /// error on theta
-    Double_t sigma_phi = 0;  /// error on phi
-    Double_t rho = 0;  /// correlation coefficient between theta and phi
-    Double_t chisq = 0; /// chisq/ndof of peak finding process, if available (otherwise zero)
     Double_t theta_adjustment_needed = 0; /// If an event barely missed the ground, it is useful to see the coordinates at which it would hit if theta adjustment by a small amount. This is the calculated small amount that leads to it hitting the ground.
 
     // Most basic resolution utility functions in payload coordinates relative to ADU5-aft-fore line
@@ -136,7 +137,7 @@ class EventSummary : public TObject
     void printEvent() const;
     friend class EventSummary;
 
-    ClassDefNV(PointingHypothesis,1);
+    ClassDefNV(PointingHypothesis,2);
   };
 
   /**
@@ -163,9 +164,6 @@ class EventSummary : public TObject
     Double_t xPolPeakHilbert; /// Peak of xpol hilbert Envelope
     Double_t xPolRmsHilbert; // RMS of xpol hilbert Envelope [Aug 2026 PUEO addition]
 
-    Double_t peakVal;  /// peak value
-    Double_t xPolPeakVal; /// Peak of xpol trace 
-
     Double_t totalPower;  /// Total power in waveform
     Double_t totalPowerXpol;  /// Total power in xPol waveform
 
@@ -185,11 +183,13 @@ class EventSummary : public TObject
     Double_t riseTime_20_50; // Rise time from 20% to 50% of peak
 
     Double_t fallTime_80_20; // Fall time from 80% to 20% of peak
-    Double_t fallTime_80_50; // Fall time from 50% to 80% of peak
+    Double_t fallTime_80_50; // Fall time from 80% to 50% of peak
     Double_t fallTime_50_20; // Fall time from 50% to 20% of peak
 
     Double_t width_20_20;  // Width from first envelope crossing of 20 percent of peak to last
     Double_t power_20_20;  /// Power enclosed within 20_20 width
+
+    Double_t philimpulsivity; //peak HE value divided by average of HE in windowed region
 
     /* ------ */
 
@@ -199,9 +199,9 @@ class EventSummary : public TObject
     Double_t fracPowerWindowBegins[numFracPowerWindows]; /// Narrowest width containing {10%, 20%, 30%, 40%, 50%} of the total power
     Double_t fracPowerWindowEnds[numFracPowerWindows]; /// Narrowest width containing {10%, 20%, 30%, 40%, 50%} of the total power
 
-    Int_t numAntennasInCoherent; /// Number of antennas used to make this
+    Double_t impulsivityMeasure; //2*A - 1 where A is the average value of the integrated HE CDF, centered at the peak HE and integrated outwards
 
-    /* NOT CURRENTLY FILLED FOR PUEO [Aug 2026] */
+    Int_t numAntennasInCoherent; /// Number of antennas used to make this
 
     //spectrum info
     Double_t bandwidth[peaksPerSpectrum]; //[0,2,16] /// bandwidth of each peak (implementation defined, may not be comparable between analyses)
@@ -209,6 +209,11 @@ class EventSummary : public TObject
     Double_t peakPower[peaksPerSpectrum]; //power within +/- bandwidth of each peak
     Double_t spectrumSlope; // [-100,100,16] ///  Slope of line fit to spectrum (in log-space, so this is spectral-index)
     Double_t spectrumIntercept; // [-200,200,16] /// Intercept of line fit to spectrum (in log-space)
+
+    /* NOT CURRENTLY FILLED FOR PUEO [Aug 2026] */
+
+    Double_t peakVal;  /// peak value
+    Double_t xPolPeakVal; /// Peak of xpol trace 
 
     //Shape parameters, computed using hilbert envelope
     // This should probably taken out into its own class
@@ -223,7 +228,6 @@ class EventSummary : public TObject
     Double_t peakTime;  //[-128,384,18] /// Time that peak hilbert env occurs
     Double_t peakMoments[5];  /// moments about Peak  (1st - 5th moments)
 
-    Double_t impulsivityMeasure; //[-1,1, 16]  /// A number that has something to do with how impulsive it is
     Double_t bandwidthMeasure; 
 
     Double_t localMaxToMin; //[0,4096,21] /// Largest value of local max to neighbouring local min (see Acclaim::RootTools::getLocalMaxToMin)
@@ -261,7 +265,7 @@ class EventSummary : public TObject
     Double_t snrHilbert;  // average value from hilbert peak-5sec to peak + 10 sec / (average of 10 secs at beginning of nonzero portion of hilbert env)
     //End BinnedAnalysis changes
 
-    ClassDefNV(WaveformInfo, 1);  //Incremented up to 19 per the advice of Cosmin.
+    ClassDefNV(WaveformInfo, 2);  //Incremented up to 19 per the advice of Cosmin.
 
    private:
     friend class EventSummary;
@@ -356,7 +360,7 @@ class EventSummary : public TObject
 
     //Quality Cut Flags
     Int_t isPayloadBlast;
-    Int_t strongCWFlag;
+    Int_t strongCWFlag; // 0 is no strong CW, 1 is strong CW in H, 2 is strong CW in V, 3 is strong CW in both
     Int_t hasGlitch; //Data is flatlined in some way
 
     /* Aug 2026 PUEO addition */
@@ -558,8 +562,8 @@ class EventSummary : public TObject
   MCTruth mc; /// Contains summary information about MC truth, if real data then this filled with constant, unphysical values.
   
   //BinnedAnalysis additions - JCF 9/29/2021
-  WaveformInfo inputWfRaw[pueo::pol::kNotAPol][k::NUM_ANTS];
-  WaveformInfo inputWfFiltered[pueo::pol::kNotAPol][k::NUM_ANTS];
+  //WaveformInfo inputWfRaw[pueo::pol::kNotAPol][k::NUM_ANTS];
+  //WaveformInfo inputWfFiltered[pueo::pol::kNotAPol][k::NUM_ANTS];
   //End BinnedAnalysis additions
 
   /* -- */

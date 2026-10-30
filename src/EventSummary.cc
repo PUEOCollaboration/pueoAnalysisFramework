@@ -111,13 +111,13 @@ void pueo::EventSummary::zeroInternals(){
     }
 
     //BinnedAnalysis addition - JCF 9/29/2021
-    for (int ant=0; ant<k::NUM_ANTS; ++ant) {
+    /*for (int ant=0; ant<k::NUM_ANTS; ++ant) {
       memset(&inputWfRaw[polInd][ant],0,sizeof(WaveformInfo));
       memset(&inputWfFiltered[polInd][ant],0,sizeof(WaveformInfo));
-    }
+    }*/
     //End BinnedAnalysis addition.
 
-    for(Int_t ant=0; ant < 48; ant++){
+    for(Int_t ant=0; ant < k::NUM_ANTS; ant++){
       memset(&channels[polInd][ant],0,sizeof(ChannelInfo));
       channels[polInd][ant].pol = pol;
       channels[polInd][ant].ant = ant;
@@ -129,6 +129,15 @@ void pueo::EventSummary::zeroInternals(){
   sun.reset();
   wais.reset(); 
   ldb.reset(); 
+  td.reset();
+  s200.reset();
+  hicalA.reset();
+  hicalB.reset();
+  muos1.reset();
+  muos2.reset();
+  muos3.reset();
+  muos4.reset();
+  muos5.reset();
   mc.reset();
 
 }
