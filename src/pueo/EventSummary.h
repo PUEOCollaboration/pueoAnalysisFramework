@@ -42,6 +42,7 @@ class EventSummary : public TObject
    * Static members (for array sizes inside class)
    *************************************************************************************/
   static const Int_t maxDirectionsPerPol = 3; /// The maximum number of hypotheses storable per polarization */
+  static const Int_t maxLFDirectionsPerPol = 1; /// The maximum number of LF hypotheses storable per polarization [Oct 2026 PUEO addition]
   static const Int_t peaksPerSpectrum = 3; /// The maximum number of frequency peaks per waveform spectrum
   static const Int_t numFracPowerWindows = 5;
   static const Int_t numBlastPowerBands = 3;
@@ -439,9 +440,10 @@ class EventSummary : public TObject
 
     Double_t mapValue[k::NUM_POLS];  ///what the instantaneous map value is at this source hypothesis
     Double_t mapHistoryVal[k::NUM_POLS]; /// a history of the interferometric map value for the source location
+    Double_t lfMapValue[k::NUM_POLS]; /// what the instantaneous LF map value is at this source hypothesis [Oct 2026 PUEO addition]
 
     void reset(); /// sets all the values to nonsense.  Sorry, mapHistoryVal means this is in source now
-    virtual ~SourceHypothesis() { ; } 
+    virtual ~SourceHypothesis() { ; }
 
     ClassDef(SourceHypothesis,1);
   };
@@ -548,6 +550,12 @@ class EventSummary : public TObject
   SourceHypothesis muos3; /// Contains location of MUOS 3 in map coordinates at time of event
   SourceHypothesis muos4; /// Contains location of MUOS 4 in map coordinates at time of event
   SourceHypothesis muos5; /// Contains location of MUOS 5 in map coordinates at time of event
+  /* -- */
+
+  /* Oct 2026 PUEO additions: LF (low frequency) interferometric map */
+  std::array<int, pueo::pol::kNotAPol> nLFPeaks; /// Number of LF peaks stored (0 if the LF reconstruction did not run for this pol)
+  PointingHypothesis lfPeak[pueo::pol::kNotAPol][maxLFDirectionsPerPol]; /// Summaries of the LF map peak directions, same conventions as peak[][]
+  WaveformInfo lfCoherent[pueo::pol::kNotAPol][maxLFDirectionsPerPol]; /// Summaries of the LF coherently summed waveforms, array index correponds to entry in lfPeak[][]
   /* -- */
 
   PayloadLocation location; /// Reduced GPS data
