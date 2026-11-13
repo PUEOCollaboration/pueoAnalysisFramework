@@ -555,7 +555,8 @@ class EventSummary : public TObject
   /* Oct 2026 PUEO additions: LF (low frequency) interferometric map */
   std::array<int, pueo::pol::kNotAPol> nLFPeaks; /// Number of LF peaks stored (0 if the LF reconstruction did not run for this pol)
   PointingHypothesis lfPeak[pueo::pol::kNotAPol][maxLFDirectionsPerPol]; /// Summaries of the LF map peak directions, same conventions as peak[][]
-  WaveformInfo lfCoherent[pueo::pol::kNotAPol][maxLFDirectionsPerPol]; /// Summaries of the LF coherently summed waveforms, array index correponds to entry in lfPeak[][]
+  WaveformInfo lfCoherent[pueo::pol::kNotAPol][maxLFDirectionsPerPol]; /// Summaries of the LF coherently summed waveforms toward the LF map peak lfPeak[pol][dir]
+  WaveformInfo lfCoherentMI[pueo::pol::kNotAPol][maxLFDirectionsPerPol]; /// Summaries of the LF coherently summed waveforms toward the MI map peak peak[pol][dir] 
   /* -- */
 
   PayloadLocation location; /// Reduced GPS data
@@ -643,7 +644,7 @@ class EventSummary : public TObject
   void resetNonPersistent() const;
   const SourceHypothesis* sourceFromTag() const;
 
-  ClassDefNV(pueo::EventSummary, 1);
+  ClassDefNV(pueo::EventSummary, 1); 
 };
 }
 

@@ -115,6 +115,7 @@ void pueo::EventSummary::zeroInternals(){
     {
       memset(&lfPeak[polInd][dir],0,sizeof(PointingHypothesis));
       memset(&lfCoherent[polInd][dir],0,sizeof(WaveformInfo));
+      memset(&lfCoherentMI[polInd][dir],0,sizeof(WaveformInfo));
     }
 
     //BinnedAnalysis addition - JCF 9/29/2021
@@ -1275,6 +1276,7 @@ void pueo::EventSummary::findTrainingPeak() const {
         for(Int_t dir=0; dir < maxLFDirectionsPerPol; dir++){
           lfPeak[polInd][dir].fContainer = const_cast<pueo::EventSummary*>(this); // Set non-persistent pointer to container in hacky fashion.
           lfCoherent[polInd][dir].fContainer = const_cast<pueo::EventSummary*>(this); // Set non-persistent pointer to container in hacky fashion.
+          lfCoherentMI[polInd][dir].fContainer = const_cast<pueo::EventSummary*>(this); // Set non-persistent pointer to container in hacky fashion.
         }
       }
       fLastEventNumber=eventNumber;
