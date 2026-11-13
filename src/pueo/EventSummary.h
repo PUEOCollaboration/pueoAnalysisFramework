@@ -427,6 +427,21 @@ class EventSummary : public TObject
   };
 
 
+  /**
+   * @class PriorEventInfo
+   * Information about the event immediately preceding this one in the data stream.
+   * Extensible container for prior-event properties used in quality analysis.
+   */
+  class PriorEventInfo
+  {
+   public:
+    PriorEventInfo() { reset(); }
+    void reset() { isBlast = 0; }
+
+    Int_t isBlast;       /// Whether the prior event was classified as a payload blast
+
+    ClassDefNV(PriorEventInfo, 1);
+  };
 
 
 
@@ -541,6 +556,7 @@ class EventSummary : public TObject
   
   ChannelInfo channels[pueo::pol::kNotAPol][k::NUM_ANTS]; /// Summaries of each channel's waveform.
   EventFlags flags; /// Flags corresponding the event quality, trigger type, calibration pulser timing, etc.
+  PriorEventInfo priorEvent; /// Information about the immediately preceding event
   SourceHypothesis sun; /// Contains location of sun in map coordinates at time of event
   SourceHypothesis ldb; /// Contains location of LDB cal pulser in map coordinates at time of event
 
@@ -648,7 +664,7 @@ class EventSummary : public TObject
   void resetNonPersistent() const;
   const SourceHypothesis* sourceFromTag() const;
 
-  ClassDefNV(pueo::EventSummary, 1); 
+  ClassDefNV(pueo::EventSummary, 2);
 };
 }
 

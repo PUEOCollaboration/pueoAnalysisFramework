@@ -131,8 +131,9 @@ void pueo::EventSummary::zeroInternals(){
       channels[polInd][ant].ant = ant;
     }
   }
-  memset(&flags,0, sizeof(EventFlags)); 
-  flags.pulser = EventFlags::NONE; 
+  memset(&flags,0, sizeof(EventFlags));
+  flags.pulser = EventFlags::NONE;
+  priorEvent.reset();
 
   sun.reset();
   wais.reset(); 

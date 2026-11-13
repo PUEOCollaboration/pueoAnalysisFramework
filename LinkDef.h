@@ -15,6 +15,7 @@
 #pragma link C++ class pueo::EventSummary::SourceHypothesis+;
 #pragma link C++ class pueo::EventSummary::MCTruth+;
 #pragma link C++ class pueo::EventSummary::PayloadLocation+;
+#pragma link C++ class pueo::EventSummary::PriorEventInfo+;
 #pragma link C++ class pueo::FilteredEvent+;
 #pragma link C++ class pueo::FilterStrategy+;
 #pragma link C++ class pueo::AnalysisWaveform+;
